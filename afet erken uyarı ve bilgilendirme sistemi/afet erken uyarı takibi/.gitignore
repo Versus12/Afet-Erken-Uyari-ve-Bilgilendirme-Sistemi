@@ -1,0 +1,22 @@
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build dosyalari
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio test dosyalari
+[Tt]est[Rr]esult*/
+*.trx
+
+# Gecici dosyalar
+*.tmp
+*.log
+
+# Veritabani yedekleri
+*.bak
