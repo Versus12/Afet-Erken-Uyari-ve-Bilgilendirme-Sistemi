@@ -1,0 +1,40 @@
+@model List<Bolge>
+@{
+    ViewData["Title"] = "Bölge Yönetimi";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h3 mb-0">Bölge Yönetimi <span class="badge bg-secondary">@Model.Count</span></h1>
+    <a class="btn btn-ana btn-sm" asp-controller="Bolge" asp-action="Duzenle">+ Yeni bölge</a>
+</div>
+
+<div class="kart">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr><th>No</th><th>İl</th><th>İlçe</th><th>Risk (1-5)</th><th>Enlem</th><th>Boylam</th><th></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var b in Model)
+                {
+                    <tr>
+                        <td>@b.BolgeId</td>
+                        <td>@b.Il</td>
+                        <td>@b.Ilce</td>
+                        <td><span class="badge bg-@(b.RiskSeviyesi >= 4 ? "danger" : b.RiskSeviyesi == 3 ? "warning text-dark" : "secondary")">@b.RiskSeviyesi</span></td>
+                        <td>@b.Enlem?.ToString("0.######")</td>
+                        <td>@b.Boylam?.ToString("0.######")</td>
+                        <td class="text-nowrap text-end">
+                            <a class="btn btn-sm btn-outline-primary" asp-controller="Bolge" asp-action="Duzenle" asp-route-id="@b.BolgeId">Düzenle</a>
+                            <form asp-controller="Bolge" asp-action="Sil" asp-route-id="@b.BolgeId" method="post" class="d-inline"
+                                  data-onay="@b.BolgeAdi silinsin mi?">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Sil</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="small text-muted mt-2 mb-0">Aboneliği, uyarısı veya toplanma alanı olan bölgeler silinemez.</p>
+</div>

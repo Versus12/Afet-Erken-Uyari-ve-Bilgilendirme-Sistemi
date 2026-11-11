@@ -1,0 +1,20 @@
+@model HataModel
+@{
+    ViewData["Title"] = "Hata";
+    string mesaj = Model.DurumKodu switch
+    {
+        404 => "Aradığınız sayfa bulunamadı.",
+        403 => "Bu sayfaya erişim yetkiniz yok.",
+        _ => "İsteğiniz işlenirken beklenmeyen bir hata oluştu. Veritabanı bağlantısını kontrol edip tekrar deneyiniz."
+    };
+}
+
+<div class="kart text-center py-5">
+    <h1 class="display-6 text-danger">@(Model.DurumKodu == 0 ? "Hata" : Model.DurumKodu.ToString())</h1>
+    <p class="lead">@mesaj</p>
+    @if (!string.IsNullOrEmpty(Model.IstekKimligi))
+    {
+        <p class="text-muted small">İstek kimliği: <code>@Model.IstekKimligi</code></p>
+    }
+    <a class="btn btn-ana" asp-controller="Home" asp-action="Index">Ana sayfaya dön</a>
+</div>

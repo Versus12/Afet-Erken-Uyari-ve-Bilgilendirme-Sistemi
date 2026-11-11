@@ -1,0 +1,118 @@
+@model AbonelikSayfaModel
+@{
+    ViewData["Title"] = "Aboneliklerim";
+    var aboneOlunanlar = Model.Abonelikler.Select(a => a.BolgeId).ToHashSet();
+}
+
+<h1 class="h3 mb-3">Bölge Aboneliklerim</h1>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="kart">
+            <div class="kart-baslik">Yeni abonelik</div>
+            <form asp-controller="Abonelik" asp-action="AboneOl" method="post">
+                <div class="mb-3">
+                    <label for="bolgeId" class="form-label">Bölge</label>
+                    <select id="bolgeId" name="bolgeId" class="form-select" required>
+                        <option value="">Bölge seçiniz…</option>
+                        @foreach (var b in Model.Bolgeler.Where(b => !aboneOlunanlar.Contains(b.BolgeId)))
+                        {
+                            <option value="@b.BolgeId">@b.BolgeAdi (risk @b.RiskSeviyesi/5)</option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="kanal" class="form-label">Bildirim kanalı</label>
+                    <select id="kanal" name="kanal" class="form-select">
+                        @foreach (var k in BildirimKanallari.Tumu)
+                        {
+                            <option value="@k">@k</option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="minSeviye" class="form-label">Bu seviye ve üzerindeki uyarıları göster</label>
+                    <select id="minSeviye" name="minSeviye" class="form-select">
+                        @for (int s = UyariSeviyeleri.EnDusuk; s <= UyariSeviyeleri.EnYuksek; s++)
+                        {
+                            <option value="@s">@s - @UyariSeviyeleri.Ad(s)</option>
+                        }
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-ana w-100">Abone Ol</button>
+            </form>
+            <p class="small text-muted mt-3 mb-0">
+                @Model.Abonelikler.Count / @AbonelikManagerSiniri bölgeye abonesiniz.
+                SMS ve e-posta gönderimi Hafta 9'da eklenecek; şimdilik tercih olarak kaydedilir.
+            </p>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="kart">
+            <div class="kart-baslik">Aboneliklerim ve tercihlerim</div>
+            @if (Model.Abonelikler.Count == 0)
+            {
+                <p class="text-muted mb-0">Henüz abonelik yok.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                            <tr><th>Bölge</th><th>Kanal</th><th>Min. seviye</th><th>Aktif</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var a in Model.Abonelikler)
+                            {
+                                string formId = "tercih" + a.AbonelikId;
+                                <tr>
+                                    <td>
+                                        <strong>@a.BolgeAdi</strong>
+                                        <div class="small text-muted">Risk @a.RiskSeviyesi/5 · @a.AboneTarihi.ToString("dd.MM.yyyy")</div>
+                                    </td>
+                                    <td>
+                                        <select name="kanal" form="@formId" class="form-select form-select-sm" aria-label="Bildirim kanalı">
+                                            @foreach (var k in BildirimKanallari.Tumu)
+                                            {
+                                                <option value="@k" selected="@(k == a.BildirimKanali)">@k</option>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="minSeviye" form="@formId" class="form-select form-select-sm" aria-label="En düşük uyarı seviyesi">
+                                            @for (int s = UyariSeviyeleri.EnDusuk; s <= UyariSeviyeleri.EnYuksek; s++)
+                                            {
+                                                <option value="@s" selected="@(s == a.MinSeviye)">@UyariSeviyeleri.Ad(s)</option>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" name="aktifMi" value="true" form="@formId" class="form-check-input"
+                                               checked="@a.AktifMi" aria-label="Bildirimler aktif" />
+                                        <input type="hidden" name="aktifMi" value="false" form="@formId" />
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <form id="@formId" asp-controller="Abonelik" asp-action="TercihGuncelle" method="post" class="d-inline">
+                                            <input type="hidden" name="abonelikId" value="@a.AbonelikId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">Kaydet</button>
+                                        </form>
+                                        <form asp-controller="Abonelik" asp-action="Iptal" method="post" class="d-inline"
+                                              data-onay="@a.BolgeAdi aboneliğiniz iptal edilsin mi?">
+                                            <input type="hidden" name="abonelikId" value="@a.AbonelikId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">İptal</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    private const int AbonelikManagerSiniri = AfetErkenUyari.Web.Business.AbonelikManager.MaksimumAbonelik;
+}

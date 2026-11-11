@@ -5,6 +5,15 @@ yerel yönetimlerin de uyarı yayınlayabildiği **Windows Forms (.NET Framework
 
 > Bilgisayar Uygulamaları I – Proje Tabanlı Ders · **P14** · Sürüm **v0.8.0 (Vize ara sürümü, Hafta 3–8)**
 
+Çözümde iki istemci vardır; ikisi de aynı SQL Server veritabanını (`AfetBilgilendirme`) kullanır:
+
+| Proje | Teknoloji | Klasör |
+|---|---|---|
+| Masaüstü uygulaması | Windows Forms, .NET Framework 4.7.2 | `afet erken uyarı ve bilgilendirme sistemi/` |
+| Web sitesi | ASP.NET Core MVC, .NET 9 | [`AfetErkenUyari.Web/`](AfetErkenUyari.Web/README.md) |
+
+Web sitesinin kurulumu ve sayfaları için: [AfetErkenUyari.Web/README.md](AfetErkenUyari.Web/README.md)
+
 ## Özellikler
 | Modül | Vatandaş | Yönetici |
 |---|---|---|

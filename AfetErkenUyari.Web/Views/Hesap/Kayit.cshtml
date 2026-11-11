@@ -1,0 +1,42 @@
+@model KayitModel
+@{
+    ViewData["Title"] = "Kayıt Ol";
+}
+
+<div class="giris-kutusu kart">
+    <h1 class="h4 mb-3">Vatandaş Kaydı</h1>
+    <form asp-controller="Hesap" asp-action="Kayit" method="post" novalidate>
+        <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+        <div class="mb-3">
+            <label asp-for="KullaniciAdi" class="form-label"></label>
+            <input asp-for="KullaniciAdi" class="form-control" autocomplete="username" maxlength="50" />
+            <div class="form-text">Harf (Türkçe karakter hariç), rakam, "_" ve "." kullanılabilir.</div>
+            <span asp-validation-for="KullaniciAdi" class="text-danger small"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Eposta" class="form-label"></label>
+            <input asp-for="Eposta" class="form-control" autocomplete="email" maxlength="150" />
+            <span asp-validation-for="Eposta" class="text-danger small"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Sifre" class="form-label"></label>
+            <input asp-for="Sifre" class="form-control" autocomplete="new-password" maxlength="100" />
+            <div class="form-text">En az 8 karakter; en az bir büyük harf, bir küçük harf ve bir rakam.</div>
+            <span asp-validation-for="Sifre" class="text-danger small"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="SifreTekrar" class="form-label"></label>
+            <input asp-for="SifreTekrar" class="form-control" autocomplete="new-password" maxlength="100" />
+            <span asp-validation-for="SifreTekrar" class="text-danger small"></span>
+        </div>
+        <button type="submit" class="btn btn-ana w-100">Hesap Oluştur</button>
+    </form>
+    <p class="mt-3 mb-0 small">
+        Zaten hesabınız var mı? <a asp-controller="Hesap" asp-action="Giris">Giriş yapın</a>
+    </p>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

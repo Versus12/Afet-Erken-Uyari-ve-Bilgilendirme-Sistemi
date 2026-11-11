@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+
+<section class="tanitim p-4 p-md-5 mb-4">
+    <h1 class="fw-bold">Afet Erken Uyarı ve Bilgilendirme Sistemi</h1>
+    <p class="lead mb-4">
+        Bölgenize özel afet uyarılarını ve hazırlık yönergelerini tek bir yerden takip edin.
+    </p>
+    <a class="btn btn-light btn-lg me-2" asp-controller="Hesap" asp-action="Kayit">Kayıt Ol</a>
+    <a class="btn btn-outline-light btn-lg" asp-controller="Hesap" asp-action="Giris">Giriş Yap</a>
+</section>
+
+<div class="row g-3">
+    <div class="col-md-6 col-lg-3">
+        <div class="kart h-100">
+            <div class="kart-baslik">📍 Bölge aboneliği</div>
+            <p class="mb-0">İl ve ilçelere abone olun; bildirim kanalınızı ve hangi seviyedeki uyarıları almak istediğinizi seçin.</p>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="kart h-100">
+            <div class="kart-baslik">📢 Uyarı yayını</div>
+            <p class="mb-0">Yerel yönetimler bir veya birden çok bölgeye; bilgi, dikkat, tehlike ve acil seviyesinde uyarı yayınlar.</p>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="kart h-100">
+            <div class="kart-baslik">📘 Hazırlık rehberi</div>
+            <p class="mb-0">Deprem, sel, yangın gibi afetlerde önce, sırasında ve sonra yapılması gerekenler.</p>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="kart h-100">
+            <div class="kart-baslik">🏁 Toplanma alanları</div>
+            <p class="mb-0">Bölgenizdeki güvenli toplanma alanlarını ve kapasitelerini öğrenin.</p>
+        </div>
+    </div>
+</div>
+
+<div class="kart mt-4">
+    <div class="kart-baslik">Neden önemli?</div>
+    <p class="mb-0">
+        Vatandaşlar risk bilgisine ve hazırlık yönergelerine dağınık kanallardan ulaşıyor.
+        Zamanında bilgi ve hazırlık, afetin etkisini ciddi ölçüde azaltır.
+        Bu sistem, vatandaşlar ve yerel yönetimler için bölge bazlı tek bir bilgilendirme noktası sunar.
+    </p>
+</div>

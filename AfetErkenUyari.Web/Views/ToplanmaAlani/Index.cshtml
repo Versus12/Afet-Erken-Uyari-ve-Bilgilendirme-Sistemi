@@ -1,0 +1,77 @@
+@model ToplanmaAlaniSayfaModel
+@{
+    ViewData["Title"] = "Toplanma Alanları";
+    bool yonetici = User.IsInRole(Roller.Yonetici);
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h3 mb-0">Toplanma Alanları</h1>
+    @if (yonetici)
+    {
+        <a class="btn btn-ana btn-sm" asp-controller="ToplanmaAlani" asp-action="Duzenle">+ Yeni alan</a>
+    }
+</div>
+
+<form asp-controller="ToplanmaAlani" asp-action="Index" method="get" class="d-flex flex-wrap align-items-center gap-3 mb-3" role="search">
+    <div class="d-flex align-items-center gap-2">
+        <label for="bolgeId" class="col-form-label">Bölge:</label>
+        <select id="bolgeId" name="bolgeId" class="form-select w-auto" onchange="this.form.submit()">
+            <option value="">Tüm bölgeler</option>
+            @foreach (var b in Model.Bolgeler)
+            {
+                <option value="@b.BolgeId" selected="@(b.BolgeId == Model.BolgeId)">@b.BolgeAdi</option>
+            }
+        </select>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="aboneliklerim" name="aboneliklerim" value="true"
+               checked="@Model.Aboneliklerim" onchange="this.form.submit()" />
+        <label class="form-check-label" for="aboneliklerim">Yalnızca abone olduğum bölgeler</label>
+    </div>
+    <noscript><button type="submit" class="btn btn-outline-secondary btn-sm">Filtrele</button></noscript>
+</form>
+
+<div class="kart">
+    @if (Model.Alanlar.Count == 0)
+    {
+        <p class="text-muted mb-0">Bu filtreye uygun toplanma alanı yok.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Bölge</th><th>Alan adı</th><th>Adres</th><th class="text-end">Kapasite</th>
+                        @if (yonetici) { <th></th> }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model.Alanlar)
+                    {
+                        <tr>
+                            <td>@t.BolgeAdi</td>
+                            <td><strong>@t.AlanAdi</strong></td>
+                            <td>@t.Adres</td>
+                            <td class="text-end">@t.Kapasite.ToString("N0")</td>
+                            @if (yonetici)
+                            {
+                                <td class="text-nowrap text-end">
+                                    <a class="btn btn-sm btn-outline-primary" asp-controller="ToplanmaAlani" asp-action="Duzenle" asp-route-id="@t.AlanId">Düzenle</a>
+                                    <form asp-controller="ToplanmaAlani" asp-action="Sil" asp-route-id="@t.AlanId" method="post" class="d-inline"
+                                          data-onay="@t.AlanAdi silinsin mi?">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Sil</button>
+                                    </form>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <p class="small text-muted mt-2 mb-0">
+            @Model.Alanlar.Count alan · toplam kapasite @Model.Alanlar.Sum(t => t.Kapasite).ToString("N0") kişi.
+            Harita gösterimi ve en yakın alan hesabı Hafta 11 kapsamındadır.
+        </p>
+    }
+</div>

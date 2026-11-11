@@ -1,0 +1,148 @@
+@model UyariYonetimModel
+@{
+    ViewData["Title"] = "Uyarı Yayını";
+    var f = Model.Form;
+    var simdi = DateTime.Now;
+}
+
+<h1 class="h3 mb-3">Uyarı Yayını</h1>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="kart">
+            <div class="kart-baslik">Yeni uyarı</div>
+            <form asp-controller="Uyari" asp-action="Yayinla" method="post" id="uyariFormu">
+                <div class="mb-3">
+                    <label for="Baslik" class="form-label">Başlık</label>
+                    <input id="Baslik" name="Baslik" value="@f.Baslik" class="form-control" maxlength="150" required />
+                </div>
+                <div class="mb-3">
+                    <label for="Mesaj" class="form-label">Mesaj <span class="text-muted small">(sade ve anlaşılır yazınız)</span></label>
+                    <textarea id="Mesaj" name="Mesaj" class="form-control" rows="4" maxlength="2000" required>@f.Mesaj</textarea>
+                    <div class="form-text text-end"><span id="karakter">@(f.Mesaj?.Length ?? 0)</span> / 2000</div>
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label for="AfetTuru" class="form-label">Afet türü</label>
+                        <select id="AfetTuru" name="AfetTuru" class="form-select">
+                            @foreach (var t in AfetTurleri.Tumu)
+                            {
+                                <option value="@t" selected="@(t == f.AfetTuru)">@t</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label for="Seviye" class="form-label">Seviye</label>
+                        <select id="Seviye" name="Seviye" class="form-select">
+                            @for (int s = UyariSeviyeleri.EnDusuk; s <= UyariSeviyeleri.EnYuksek; s++)
+                            {
+                                <option value="@s" selected="@(s == f.Seviye)">@s - @UyariSeviyeleri.Ad(s)</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <fieldset class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <legend class="form-label fs-6 mb-1">Hedef bölgeler</legend>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="tumunuSec" />
+                            <label class="form-check-label small" for="tumunuSec">Tümünü seç</label>
+                        </div>
+                    </div>
+                    <div class="bolge-listesi">
+                        @foreach (var b in f.Bolgeler)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input bolge-secim" type="checkbox" name="BolgeIdleri" value="@b.BolgeId"
+                                       id="bolge@(b.BolgeId)" checked="@f.BolgeIdleri.Contains(b.BolgeId)" />
+                                <label class="form-check-label" for="bolge@(b.BolgeId)">@b.BolgeAdi</label>
+                            </div>
+                        }
+                    </div>
+                </fieldset>
+                <div class="row g-2 align-items-end mb-3">
+                    <div class="col-5">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="BitisVar" name="BitisVar" value="true" checked="@f.BitisVar" />
+                            <input type="hidden" name="BitisVar" value="false" />
+                            <label class="form-check-label" for="BitisVar">Geçerlilik bitişi</label>
+                        </div>
+                    </div>
+                    <div class="col-7">
+                        <label for="BitisTarihi" class="visually-hidden">Bitiş tarihi</label>
+                        <input type="datetime-local" id="BitisTarihi" name="BitisTarihi" class="form-control"
+                               value="@f.BitisTarihi.ToString("yyyy-MM-ddTHH:mm")" />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-ana w-100 btn-lg">Uyarıyı Yayınla</button>
+                <p class="small text-muted mt-2 mb-0">Bir uyarı en fazla 30 gün geçerli olabilir.</p>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="kart">
+            <div class="kart-baslik">Yayınlanan uyarılar</div>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                        <tr><th>Seviye</th><th>Başlık</th><th>Bölgeler</th><th>Yayın / Bitiş</th><th>Durum</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var u in Model.Uyarilar)
+                        {
+                            string durum = u.Durum(simdi);
+                            <tr class="@(durum == "Yayında" ? "" : "text-muted")">
+                                <td><span class="badge bg-@UyariSeviyeleri.Renk(u.Seviye)">@u.SeviyeAdi</span></td>
+                                <td><strong>@u.Baslik</strong><div class="small">@u.AfetTuru · @u.YayinlayanAdi</div></td>
+                                <td class="small">@u.HedefBolgeler</td>
+                                <td class="small text-nowrap">
+                                    @u.YayinTarihi.ToString("dd.MM.yyyy HH:mm")<br />
+                                    @(u.BitisTarihi?.ToString("dd.MM.yyyy HH:mm") ?? "—")
+                                </td>
+                                <td><span class="badge @(durum == "Yayında" ? "bg-success" : "bg-secondary")">@durum</span></td>
+                                <td>
+                                    @if (u.AktifMi)
+                                    {
+                                        <form asp-controller="Uyari" asp-action="Kaldir" asp-route-id="@u.UyariId" method="post"
+                                              data-onay="&quot;@u.Baslik&quot; yayından kaldırılsın mı?">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger text-nowrap">Kaldır</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const tumu = document.getElementById("tumunuSec");
+            const kutular = document.querySelectorAll(".bolge-secim");
+            tumu.addEventListener("change", () => kutular.forEach(k => k.checked = tumu.checked));
+
+            const mesaj = document.getElementById("Mesaj");
+            mesaj.addEventListener("input", () => document.getElementById("karakter").textContent = mesaj.value.length);
+
+            const bitisVar = document.getElementById("BitisVar");
+            const bitis = document.getElementById("BitisTarihi");
+            const guncelle = () => bitis.disabled = !bitisVar.checked;
+            bitisVar.addEventListener("change", guncelle); guncelle();
+
+            // Yayın öncesi onay: kaç bölgeye, hangi seviyede gideceği gösterilir.
+            document.getElementById("uyariFormu").addEventListener("submit", function (e) {
+                const secili = document.querySelectorAll(".bolge-secim:checked").length;
+                if (secili === 0) return; // sunucu "en az bir bölge" kuralıyla reddeder
+                const seviye = document.getElementById("Seviye").selectedOptions[0].text;
+                const baslik = document.getElementById("Baslik").value.trim();
+                if (!confirm('"' + baslik + '" uyarısı ' + secili + ' bölgeye ' + seviye.toUpperCase() + ' seviyesinde yayınlanacak. Onaylıyor musunuz?'))
+                    e.preventDefault();
+            });
+        })();
+    </script>
+}

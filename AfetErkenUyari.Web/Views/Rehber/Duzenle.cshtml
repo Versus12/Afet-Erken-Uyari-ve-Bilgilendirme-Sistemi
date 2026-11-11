@@ -1,0 +1,38 @@
+@model HazirlikRehberi
+@{
+    bool yeni = Model.RehberId == 0;
+    ViewData["Title"] = yeni ? "Yeni Rehber Kaydı" : "Rehber Düzenle";
+}
+
+<div class="kart" style="max-width: 760px">
+    <h1 class="h4 mb-3">@ViewData["Title"]</h1>
+    <form asp-controller="Rehber" asp-action="Duzenle" method="post">
+        <input type="hidden" asp-for="RehberId" />
+        <div class="row g-3">
+            <div class="col-md-5">
+                <label asp-for="AfetTuru" class="form-label">Afet türü</label>
+                <select asp-for="AfetTuru" class="form-select" asp-items="@(new SelectList(AfetTurleri.Tumu))"></select>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Asama" class="form-label">Aşama</label>
+                <select asp-for="Asama" class="form-select" asp-items="@(new SelectList(RehberAsamalari.Tumu))"></select>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Sira" class="form-label">Sıra</label>
+                <input asp-for="Sira" class="form-control" type="number" min="1" max="100" />
+            </div>
+            <div class="col-12">
+                <label asp-for="Baslik" class="form-label">Başlık</label>
+                <input asp-for="Baslik" class="form-control" maxlength="150" required />
+            </div>
+            <div class="col-12">
+                <label asp-for="Icerik" class="form-label">İçerik</label>
+                <textarea asp-for="Icerik" class="form-control" rows="6" maxlength="4000" required></textarea>
+            </div>
+        </div>
+        <div class="mt-3 d-flex gap-2">
+            <button type="submit" class="btn btn-ana">Kaydet</button>
+            <a class="btn btn-outline-secondary" asp-controller="Rehber" asp-action="Index">Vazgeç</a>
+        </div>
+    </form>
+</div>

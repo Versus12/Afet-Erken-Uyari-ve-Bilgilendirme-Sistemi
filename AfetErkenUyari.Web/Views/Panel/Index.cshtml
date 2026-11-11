@@ -1,0 +1,115 @@
+@model List<Uyari>
+@{
+    ViewData["Title"] = "Uyarılarım";
+    int abonelikSayisi = ViewBag.AbonelikSayisi ?? 0;
+    string kimlikler = string.Join(",", Model.Select(u => u.UyariId));
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h1 class="h3 mb-0">Bölgelerimdeki Güncel Uyarılar <span class="badge bg-secondary">@Model.Count</span></h1>
+        <div class="text-muted small">
+            @abonelikSayisi bölgeye abonesiniz · Son güncelleme: <span id="sonGuncelleme">@DateTime.Now.ToString("HH:mm:ss")</span>
+            · Liste her dakika otomatik kontrol edilir.
+        </div>
+    </div>
+    <a class="btn btn-outline-secondary btn-sm" asp-controller="Panel" asp-action="Index">Yenile</a>
+</div>
+
+@if (abonelikSayisi == 0)
+{
+    <div class="alert alert-info">
+        Henüz hiçbir bölgeye abone değilsiniz. Uyarı almak için
+        <a asp-controller="Abonelik" asp-action="Index" class="alert-link">Aboneliklerim</a> sayfasından bölge ekleyin.
+    </div>
+}
+else if (Model.Count == 0)
+{
+    <div class="alert alert-success">Abone olduğunuz bölgelerde şu an yürürlükte uyarı yok.</div>
+}
+
+<div class="vstack gap-3">
+    @foreach (var u in Model)
+    {
+        <article class="kart uyari-kart seviye-@u.Seviye">
+            <div class="d-flex flex-wrap justify-content-between gap-2">
+                <h2 class="h5 mb-1">
+                    <span class="badge bg-@UyariSeviyeleri.Renk(u.Seviye) me-1">@u.SeviyeAdi.ToUpper()</span>
+                    @u.Baslik
+                </h2>
+                <span class="text-muted small">@u.AfetTuru</span>
+            </div>
+            <p class="mb-2 text-pre">@u.Mesaj</p>
+            <div class="small text-muted">
+                <strong>Bölgeler:</strong> @u.HedefBolgeler ·
+                <strong>Yayın:</strong> @u.YayinTarihi.ToString("dd.MM.yyyy HH:mm")
+                @if (u.BitisTarihi.HasValue)
+                {
+                    <text>· <strong>Geçerlilik:</strong> @u.BitisTarihi.Value.ToString("dd.MM.yyyy HH:mm")</text>
+                }
+            </div>
+            <div class="mt-2 small">
+                <a asp-controller="Rehber" asp-action="Index" asp-route-afetTuru="@u.AfetTuru">@u.AfetTuru hazırlık rehberi →</a>
+                <span class="mx-1">|</span>
+                <a asp-controller="ToplanmaAlani" asp-action="Index" asp-route-aboneliklerim="true">Toplanma alanlarım →</a>
+            </div>
+        </article>
+    }
+</div>
+
+<div id="yeniUyariBildirimi" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+        <div class="toast-body">
+            <strong>⚠ Yeni uyarı!</strong> <span id="yeniUyariMetni"></span>
+            <div class="mt-2"><a class="btn btn-light btn-sm" asp-controller="Panel" asp-action="Index">Göster</a></div>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Kapat"></button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Uygulama içi bildirim (Hafta 8): her 60 sn'de bir yeni uyarı var mı kontrol edilir.
+        // Bu istek oturum süresini uzatmaz; 30 dk işlem yapılmazsa oturum yine düşer.
+        (function () {
+            const bilinen = new Set("@kimlikler".split(",").filter(x => x).map(Number));
+            const adres = "@Url.Action("UyariOzeti", "Panel")";
+
+            function sesCal() {
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    osc.frequency.value = 880;
+                    osc.connect(ctx.destination);
+                    osc.start();
+                    setTimeout(() => { osc.stop(); ctx.close(); }, 400);
+                } catch (e) { /* tarayıcı sesi engellediyse sessiz devam */ }
+            }
+
+            async function kontrolEt() {
+                try {
+                    const yanit = await fetch(adres, { headers: { "Accept": "application/json" }, credentials: "same-origin" });
+                    const tur = yanit.headers.get("content-type") || "";
+                    if (!tur.includes("application/json")) {
+                        // Oturum düşmüş: giriş sayfasına yönlendirildi
+                        window.location = "@Url.Action("Giris", "Hesap")";
+                        return;
+                    }
+                    const veri = await yanit.json();
+                    document.getElementById("sonGuncelleme").textContent = new Date().toLocaleTimeString("tr-TR");
+                    const yeniler = veri.kimlikler.filter(id => !bilinen.has(id));
+                    if (yeniler.length > 0) {
+                        yeniler.forEach(id => bilinen.add(id));
+                        document.getElementById("yeniUyariMetni").textContent = yeniler.length + " yeni uyarı yayınlandı.";
+                        bootstrap.Toast.getOrCreateInstance(document.getElementById("yeniUyariBildirimi"), { autohide: false }).show();
+                        sesCal();
+                    }
+                } catch (e) {
+                    document.getElementById("sonGuncelleme").textContent = "bağlantı hatası (" + new Date().toLocaleTimeString("tr-TR") + ")";
+                }
+            }
+
+            setInterval(kontrolEt, 60000);
+        })();
+    </script>
+}

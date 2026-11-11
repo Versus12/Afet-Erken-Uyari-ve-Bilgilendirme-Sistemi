@@ -1,0 +1,64 @@
+@model RehberSayfaModel
+@{
+    ViewData["Title"] = "Hazırlık Rehberi";
+    bool yonetici = User.IsInRole(Roller.Yonetici);
+    var gruplar = Model.Kayitlar.GroupBy(r => r.AfetTuru);
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h3 mb-0">Hazırlık Rehberi</h1>
+    @if (yonetici)
+    {
+        <a class="btn btn-ana btn-sm" asp-controller="Rehber" asp-action="Duzenle">+ Yeni rehber kaydı</a>
+    }
+</div>
+
+<form asp-controller="Rehber" asp-action="Index" method="get" class="d-flex flex-wrap gap-2 mb-4" role="search">
+    <label for="afetTuru" class="col-form-label">Afet türü:</label>
+    <select id="afetTuru" name="afetTuru" class="form-select w-auto" onchange="this.form.submit()">
+        <option value="">Tüm afet türleri</option>
+        @foreach (var t in AfetTurleri.Tumu)
+        {
+            <option value="@t" selected="@(t == Model.AfetTuru)">@t</option>
+        }
+    </select>
+    <noscript><button type="submit" class="btn btn-outline-secondary">Filtrele</button></noscript>
+</form>
+
+@if (!Model.Kayitlar.Any())
+{
+    <div class="alert alert-info">Bu afet türü için henüz rehber içeriği eklenmemiş.</div>
+}
+
+@foreach (var g in gruplar)
+{
+    <section class="kart mb-4">
+        <h2 class="h4">@g.Key</h2>
+        <div class="row g-3">
+            @foreach (var asama in RehberAsamalari.Tumu)
+            {
+                var kayitlar = g.Where(r => r.Asama == asama).ToList();
+                if (kayitlar.Count == 0) { continue; }
+                <div class="col-md-4">
+                    <h3 class="h6 text-uppercase text-muted">Afetten @(asama == "Sırasında" ? "sırasında" : asama == "Önce" ? "önce" : "sonra")</h3>
+                    @foreach (var r in kayitlar)
+                    {
+                        <div class="border rounded p-3 mb-2 bg-light">
+                            <div class="fw-semibold">@r.Baslik</div>
+                            <div class="small text-pre">@r.Icerik</div>
+                            @if (yonetici)
+                            {
+                                <div class="mt-2 d-flex gap-2">
+                                    <a class="btn btn-sm btn-outline-primary" asp-controller="Rehber" asp-action="Duzenle" asp-route-id="@r.RehberId">Düzenle</a>
+                                    <form asp-controller="Rehber" asp-action="Sil" asp-route-id="@r.RehberId" method="post" data-onay="Bu rehber kaydı silinsin mi?">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Sil</button>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+}

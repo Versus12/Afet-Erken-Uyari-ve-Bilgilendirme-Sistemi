@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+@{
+    bool girisli = User.Identity?.IsAuthenticated == true;
+    bool yonetici = User.IsInRole(Roller.Yonetici);
+    string aktif = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    string Sinif(string c) => aktif == c ? "nav-link active" : "nav-link";
+}
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Afet Erken Uyarı</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <a class="visually-hidden-focusable" href="#icerik">İçeriğe atla</a>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark ust-cubuk">
+            <div class="container">
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">⚠ Afet Erken Uyarı</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
+                        aria-controls="menu" aria-expanded="false" aria-label="Menüyü aç/kapat">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="menu">
+                    @if (girisli)
+                    {
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item"><a class="@Sinif("Panel")" asp-controller="Panel" asp-action="Index">Uyarılarım</a></li>
+                            <li class="nav-item"><a class="@Sinif("Abonelik")" asp-controller="Abonelik" asp-action="Index">Aboneliklerim</a></li>
+                            <li class="nav-item"><a class="@Sinif("Rehber")" asp-controller="Rehber" asp-action="Index">Hazırlık Rehberi</a></li>
+                            <li class="nav-item"><a class="@Sinif("ToplanmaAlani")" asp-controller="ToplanmaAlani" asp-action="Index">Toplanma Alanları</a></li>
+                            @if (yonetici)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle @(aktif is "Bolge" or "Uyari" ? "active" : "")" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Yönetim Paneli</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-controller="Uyari" asp-action="Index">Uyarı Yayını</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Bolge" asp-action="Index">Bölge Yönetimi</a></li>
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+                        <div class="d-flex align-items-center gap-3 text-white">
+                            <span class="small">
+                                <strong>@User.Identity!.Name</strong>
+                                <span class="badge bg-light text-dark ms-1">@(yonetici ? "Yönetici" : "Vatandaş")</span>
+                            </span>
+                            <form asp-controller="Hesap" asp-action="Cikis" method="post" class="m-0">
+                                <button type="submit" class="btn btn-sm btn-outline-light">Çıkış Yap</button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item"><a class="nav-link" asp-controller="Hesap" asp-action="Giris">Giriş Yap</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Hesap" asp-action="Kayit">Kayıt Ol</a></li>
+                        </ul>
+                    }
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main id="icerik" class="container py-4" role="main">
+        <partial name="_Mesajlar" />
+        @RenderBody()
+    </main>
+
+    <footer class="border-top py-3 text-muted small">
+        <div class="container d-flex flex-wrap justify-content-between gap-2">
+            <span>Afet Erken Uyarı ve Bilgilendirme Sistemi · P14 · v0.8.0</span>
+            <span>Acil durumda <strong>112</strong>'yi arayınız.</span>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
