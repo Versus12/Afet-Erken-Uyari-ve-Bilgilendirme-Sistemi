@@ -1,19 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace afet_erken_uyarı_ve_bilgilendirme_sistemi.Entities
 {
-    internal class Abonelik
+    /// <summary>
+    /// Kullanıcı ile bölge arasındaki N-N ilişkiyi tutan ara varlık. Tablo: Abonelikler
+    /// Tercihler: bildirim kanalı ve kullanıcının almak istediği en düşük uyarı seviyesi.
+    /// </summary>
+    public class Abonelik
     {
         public int AbonelikId { get; set; }
-
-        public string AboneAdi { get; set; } = string.Empty;
-
-        public string Telefon { get; set; } = string.Empty;
-
+        public int KullaniciId { get; set; }
         public int BolgeId { get; set; }
+        public string BildirimKanali { get; set; } = "Uygulama";
+        public int MinSeviye { get; set; } = 1;
+        public DateTime AboneTarihi { get; set; }
+        public bool AktifMi { get; set; } = true;
+
+        // Listeleme için (JOIN ile doldurulur)
+        public string BolgeAdi { get; set; } = string.Empty;
+        public int RiskSeviyesi { get; set; }
     }
 }

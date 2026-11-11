@@ -1,23 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace afet_erken_uyarı_ve_bilgilendirme_sistemi.Entities
 {
-    internal class uyari
+    /// <summary>Yönetici tarafından bir veya birden çok bölgeye yayınlanan uyarı. Tablo: Uyarilar</summary>
+    public class Uyari
     {
         public int UyariId { get; set; }
+        public string Baslik { get; set; } = string.Empty;
+        public string Mesaj { get; set; } = string.Empty;
+        public string AfetTuru { get; set; } = string.Empty;
 
-        public string UyariBasligi { get; set; } = string.Empty;
+        /// <summary>1=Bilgi, 2=Dikkat, 3=Tehlike, 4=Acil</summary>
+        public int Seviye { get; set; } = 1;
 
-        public string UyariMesaji { get; set; } = string.Empty;
+        public DateTime YayinTarihi { get; set; }
+        public DateTime? BitisTarihi { get; set; }
+        public int YayinlayanId { get; set; }
+        public bool AktifMi { get; set; } = true;
 
-        public string UyariSeviyesi { get; set; } = string.Empty;
+        /// <summary>Hedef bölgeler (UyariBolgeleri tablosu)</summary>
+        public List<int> BolgeIdleri { get; set; } = new List<int>();
 
-        public DateTime UyariTarihi { get; set; }
+        // Listeleme için
+        public string HedefBolgeler { get; set; } = string.Empty;
+        public string YayinlayanAdi { get; set; } = string.Empty;
 
-        public int BolgeId { get; set; }
+        public string SeviyeAdi
+        {
+            get { return UyariSeviyeleri.Ad(Seviye); }
+        }
+
+        /// <summary>Uyarı şu an yürürlükte mi?</summary>
+        public bool GecerliMi(DateTime simdi)
+        {
+            return AktifMi && YayinTarihi <= simdi && (!BitisTarihi.HasValue || BitisTarihi.Value > simdi);
+        }
     }
 }

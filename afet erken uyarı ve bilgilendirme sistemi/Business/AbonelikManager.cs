@@ -1,29 +1,77 @@
-﻿using afet_erken_uyari_ve_bilgilendirme_sistemi;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using afet_erken_uyarı_ve_bilgilendirme_sistemi.Data;
+using afet_erken_uyarı_ve_bilgilendirme_sistemi.Entities;
 
 namespace afet_erken_uyarı_ve_bilgilendirme_sistemi.Business
 {
-    internal class AbonelikManager
+    /// <summary>
+    /// Abonelik modülü iş kuralları (Hafta 6).
+    /// - Kullanıcı birden çok bölgeye abone olabilir (en fazla <see cref="MaksimumAbonelik"/>).
+    /// - Aynı bölgeye ikinci kez abone olunamaz.
+    /// - Kullanıcı yalnızca KENDİ aboneliklerini değiştirebilir/silebilir (sahiplik kontrolü).
+    /// </summary>
+    public class AbonelikManager
     {
-        private VeritabaniBaglanti db = new VeritabaniBaglanti();
+        public const int MaksimumAbonelik = 10;
 
-        public void AbonelikEkle()
+        private readonly AbonelikRepository _repo = new AbonelikRepository();
+
+        public List<Abonelik> Aboneliklerim()
         {
-            // Abonelik ekleme işlemleri burada yapılacak.
+            Kullanici k = Oturum.GirisGerekli();
+            return _repo.KullaniciAbonelikleri(k.Id);
         }
 
-        public void AbonelikSil()
+        public int AboneOl(int bolgeId, string kanal, int minSeviye)
         {
-            // Abonelik silme işlemleri burada yapılacak.
+            Kullanici k = Oturum.GirisGerekli();
+
+            if (bolgeId <= 0) throw new IsKuraliHatasi("Lütfen bir bölge seçiniz.");
+            TercihDogrula(kanal, minSeviye);
+
+            if (_repo.AbonelikVarMi(k.Id, bolgeId))
+                throw new IsKuraliHatasi("Bu bölgeye zaten abonesiniz.");
+            if (_repo.AbonelikSayisi(k.Id) >= MaksimumAbonelik)
+                throw new IsKuraliHatasi("En fazla " + MaksimumAbonelik + " bölgeye abone olabilirsiniz.");
+
+            return _repo.Ekle(new Abonelik
+            {
+                KullaniciId = k.Id,
+                BolgeId = bolgeId,
+                BildirimKanali = kanal,
+                MinSeviye = minSeviye
+            });
         }
 
-        public void AbonelikleriListele()
+        public void TercihGuncelle(int abonelikId, string kanal, int minSeviye, bool aktifMi)
         {
-            // Abonelik listeleme işlemleri burada yapılacak.
+            SahiplikKontrol(abonelikId);
+            TercihDogrula(kanal, minSeviye);
+            _repo.TercihGuncelle(abonelikId, kanal, minSeviye, aktifMi);
+        }
+
+        public void AbonelikIptal(int abonelikId)
+        {
+            SahiplikKontrol(abonelikId);
+            _repo.Sil(abonelikId);
+        }
+
+        private void SahiplikKontrol(int abonelikId)
+        {
+            Kullanici k = Oturum.GirisGerekli();
+            Abonelik a = _repo.Getir(abonelikId);
+            if (a == null) throw new IsKuraliHatasi("Abonelik bulunamadı.");
+            if (a.KullaniciId != k.Id)
+                throw new YetkisizErisimHatasi("Başka bir kullanıcının aboneliğini değiştiremezsiniz.");
+        }
+
+        private static void TercihDogrula(string kanal, int minSeviye)
+        {
+            if (Array.IndexOf(BildirimKanallari.Tumu, kanal) < 0)
+                throw new IsKuraliHatasi("Geçersiz bildirim kanalı.");
+            if (minSeviye < UyariSeviyeleri.EnDusuk || minSeviye > UyariSeviyeleri.EnYuksek)
+                throw new IsKuraliHatasi("Geçersiz uyarı seviyesi tercihi.");
         }
     }
 }

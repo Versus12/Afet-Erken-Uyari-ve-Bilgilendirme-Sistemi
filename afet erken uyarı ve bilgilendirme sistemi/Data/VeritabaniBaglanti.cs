@@ -1,35 +1,59 @@
-﻿
-using System;
+﻿using System;
+using System.Configuration;
 using System.Data.SqlClient;
-using System.Windows.Forms;
 
-namespace afet_erken_uyari_ve_bilgilendirme_sistemi
+namespace afet_erken_uyarı_ve_bilgilendirme_sistemi.Data
 {
-    public class VeritabaniBaglanti
+    /// <summary>
+    /// Veri katmanının tek bağlantı noktası.
+    /// Bağlantı cümlesi koda gömülmez; App.config içindeki "AfetDB" kaydından okunur.
+    /// </summary>
+    public static class VeritabaniBaglanti
     {
-        private string baglantiAdresi =
-            @"Data Source=.\SQLEXPRESS;Initial Catalog=DbHelix;Integrated Security=True;TrustServerCertificate=True;";
+        private const string BaglantiAdi = "AfetDB";
 
-        public SqlConnection BaglantiOlustur()
+        public static string BaglantiCumlesi
         {
-            return new SqlConnection(baglantiAdresi);
+            get
+            {
+                ConnectionStringSettings ayar = ConfigurationManager.ConnectionStrings[BaglantiAdi];
+                if (ayar == null || string.IsNullOrWhiteSpace(ayar.ConnectionString))
+                    throw new InvalidOperationException(
+                        "App.config dosyasında '" + BaglantiAdi + "' bağlantı cümlesi bulunamadı.");
+                return ayar.ConnectionString;
+            }
         }
 
-        public void BaglantiTestEt()
+        /// <summary>Açılmış yeni bir bağlantı döndürür. Çağıran 'using' ile kapatmalıdır.</summary>
+        public static SqlConnection BaglantiAc()
+        {
+            SqlConnection baglanti = new SqlConnection(BaglantiCumlesi);
+            baglanti.Open();
+            return baglanti;
+        }
+
+        /// <summary>Uygulama açılışında veritabanına erişilebiliyor mu kontrol eder.</summary>
+        public static bool BaglantiTestEt(out string hataMesaji)
         {
             try
             {
-                using (SqlConnection baglanti = BaglantiOlustur())
+                using (SqlConnection baglanti = BaglantiAc())
                 {
-                    baglanti.Open();
-
-                    MessageBox.Show("Veritabanı bağlantısı başarılı!");
+                    hataMesaji = null;
+                    return true;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Bağlantı hatası: " + ex.Message);
+                hataMesaji = ex.Message;
+                return false;
             }
+        }
+
+        /// <summary>DBNull değerini null'a çevirir.</summary>
+        public static object DbDegeri(object deger)
+        {
+            return deger ?? DBNull.Value;
         }
     }
 }
