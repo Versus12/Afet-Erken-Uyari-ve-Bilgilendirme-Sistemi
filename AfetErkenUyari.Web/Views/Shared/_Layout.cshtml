@@ -12,6 +12,7 @@
     <title>@ViewData["Title"] - Afet Erken Uyarı</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @await RenderSectionAsync("Head", required: false)
 </head>
 <body>
     <a class="visually-hidden-focusable" href="#icerik">İçeriğe atla</a>
@@ -71,7 +72,7 @@
 
     <footer class="border-top py-3 text-muted small">
         <div class="container d-flex flex-wrap justify-content-between gap-2">
-            <span>Afet Erken Uyarı ve Bilgilendirme Sistemi · P14 · v0.10.0</span>
+            <span>Afet Erken Uyarı ve Bilgilendirme Sistemi · P14 · v0.11.0</span>
             <span>Acil durumda <strong>112</strong>'yi arayınız.</span>
         </div>
     </footer>

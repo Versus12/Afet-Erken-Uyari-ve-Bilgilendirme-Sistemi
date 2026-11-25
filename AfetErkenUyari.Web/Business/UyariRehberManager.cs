@@ -99,39 +99,4 @@ public class RehberManager(RehberRepository repo)
     }
 }
 
-/// <summary>Toplanma alanı (temel liste/CRUD). Adresten konum bulma: HaritaServisi (Hafta 9); harita modülü ve en yakın alan Hafta 11.</summary>
-public class ToplanmaAlaniManager(ToplanmaAlaniRepository repo, AbonelikRepository abonelikRepo)
-{
-    /// <summary>sadeceAboneliklerim: abonelik modülündeki bölgelerle filtreler (modül entegrasyonu).</summary>
-    public List<ToplanmaAlani> Listele(AktifKullanici kullanici, int? bolgeId, bool sadeceAboneliklerim)
-    {
-        var liste = repo.Listele(bolgeId);
-        if (sadeceAboneliklerim)
-        {
-            var aboneBolgeler = abonelikRepo.KullaniciAbonelikleri(kullanici.Id).Select(a => a.BolgeId).ToHashSet();
-            liste = liste.Where(t => aboneBolgeler.Contains(t.BolgeId)).ToList();
-        }
-        return liste;
-    }
-
-    public ToplanmaAlani? Getir(int alanId) => repo.Getir(alanId);
-
-    public void Kaydet(AktifKullanici kullanici, ToplanmaAlani t)
-    {
-        kullanici.YoneticiOlmali();
-        if (t.BolgeId <= 0) throw new IsKuraliHatasi("Bölge seçiniz.");
-        t.AlanAdi = Dogrula.Metin(t.AlanAdi, "Alan adı", 3, 150);
-        t.Adres = Dogrula.Metin(t.Adres, "Adres", 5, 300);
-        if (t.Kapasite <= 0) throw new IsKuraliHatasi("Kapasite 0'dan büyük olmalıdır.");
-        Dogrula.Koordinat(t.Enlem, t.Boylam);
-
-        if (t.AlanId > 0) repo.Guncelle(t);
-        else t.AlanId = repo.Ekle(t);
-    }
-
-    public void Sil(AktifKullanici kullanici, int alanId)
-    {
-        kullanici.YoneticiOlmali();
-        repo.Sil(alanId);
-    }
-}
+// ToplanmaAlaniManager → Business/ToplanmaHaritasi.cs (Hafta 11)

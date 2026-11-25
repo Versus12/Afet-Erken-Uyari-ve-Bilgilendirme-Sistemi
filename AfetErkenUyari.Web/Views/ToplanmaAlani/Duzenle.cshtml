@@ -29,12 +29,12 @@
                 <input asp-for="Alan.Adres" class="form-control" maxlength="300" required />
             </div>
             <div class="col-md-6">
-                <label for="Alan_Enlem" class="form-label">Enlem (isteğe bağlı)</label>
+                <label for="Alan_Enlem" class="form-label">Enlem <span class="text-muted small">(zorunlu — harita için)</span></label>
                 <input id="Alan_Enlem" name="Alan.Enlem" class="form-control" inputmode="decimal"
                        value="@Model.Alan.Enlem?.ToString(System.Globalization.CultureInfo.InvariantCulture)" placeholder="38.8847" />
             </div>
             <div class="col-md-6">
-                <label for="Alan_Boylam" class="form-label">Boylam (isteğe bağlı)</label>
+                <label for="Alan_Boylam" class="form-label">Boylam <span class="text-muted small">(zorunlu)</span></label>
                 <input id="Alan_Boylam" name="Alan.Boylam" class="form-control" inputmode="decimal"
                        value="@Model.Alan.Boylam?.ToString(System.Globalization.CultureInfo.InvariantCulture)" placeholder="40.4982" />
             </div>

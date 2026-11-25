@@ -77,6 +77,7 @@
     <Compile Include="Business\BildirimManager.cs" />
     <Compile Include="Business\EpostaGonderici.cs" />
     <Compile Include="Business\HaritaServisi.cs" />
+    <Compile Include="Business\KonumHesap.cs" />
     <Compile Include="Business\ClaudeIstemcisi.cs" />
     <Compile Include="Business\SadeUyariAraclari.cs" />
     <Compile Include="Business\SadeUyariManager.cs" />
@@ -89,6 +90,9 @@
     <Compile Include="Business\UyariManager.cs" />
     <!-- Presentation: Windows Forms ekranları -->
     <Compile Include="ArayuzYardimci.cs" />
+    <Compile Include="FrmToplanmaHaritasi.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmSadeUyari.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -191,6 +195,8 @@
     <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
     <!-- Hafta 10: resmî Anthropic (Claude) C# SDK -->
     <PackageReference Include="Anthropic" Version="13.8.0" />
+    <!-- Hafta 11: harita gösterimi için Edge (Chromium) tabanlı tarayıcı bileşeni -->
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4314.35" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

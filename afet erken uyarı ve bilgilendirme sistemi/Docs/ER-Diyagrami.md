@@ -1,5 +1,5 @@
 # Afet Erken Uyarı ve Bilgilendirme Sistemi
-## ER Diyagramı (Hafta 3 – güncellendi Hafta 10)
+## ER Diyagramı (Hafta 3 – güncellendi Hafta 11)
 
 ```mermaid
 erDiagram

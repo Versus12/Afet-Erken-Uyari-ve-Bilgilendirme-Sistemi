@@ -132,7 +132,13 @@ FROM (VALUES
         (N'Bingöl',  N'Merkez', N'Kampüs Toplanma Alanı',         N'Üniversite yerleşkesi (örnek adres)', 3000, 38.900000, 40.520000),
         (N'Bingöl',  N'Solhan', N'İlçe Parkı Toplanma Alanı',     N'Solhan merkez park (örnek adres)', 1200, 38.969000, 41.050000),
         (N'Rize',    N'Merkez', N'Sahil Parkı Toplanma Alanı',    N'Sahil yolu (örnek adres)', 2500, 41.030000, 40.520000),
-        (N'Elazığ',  N'Merkez', N'Fuar Alanı',                    N'Fuar alanı (örnek adres)', 4000, 38.670000, 39.220000)
+        (N'Elazığ',  N'Merkez', N'Fuar Alanı',                    N'Fuar alanı (örnek adres)', 4000, 38.670000, 39.220000),
+        -- Hafta 11: en yakın alan hesabının anlamlı olması için her bölgeye koordinatlı alan (sentetik)
+        (N'Bingöl',  N'Merkez', N'Kent Parkı Toplanma Alanı',     N'Kent parkı (örnek adres)', 2000, 38.881000, 40.490000),
+        (N'Bingöl',  N'Genç',   N'İlçe Stadyumu Toplanma Alanı',  N'Genç ilçe stadyumu (örnek adres)', 1500, 38.753000, 40.556000),
+        (N'Erzurum', N'Yakutiye', N'Meydan Toplanma Alanı',       N'Yakutiye meydanı (örnek adres)', 3000, 39.905000, 41.270000),
+        (N'Antalya', N'Manavgat', N'Şelale Yolu Toplanma Alanı',  N'Şelale yolu (örnek adres)', 2500, 36.787000, 31.444000),
+        (N'İstanbul', N'Kadıköy', N'Sahil Toplanma Alanı',        N'Kadıköy sahili (örnek adres)', 6000, 40.990000, 29.024000)
      ) t (Il, Ilce, AlanAdi, Adres, Kapasite, Enlem, Boylam)
 JOIN dbo.Bolgeler b ON b.Il = t.Il AND b.Ilce = t.Ilce
 WHERE NOT EXISTS (SELECT 1 FROM dbo.ToplanmaAlanlari x WHERE x.AlanAdi = t.AlanAdi AND x.BolgeId = b.BolgeId);

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using AfetErkenUyari.Web.Business;
 using AfetErkenUyari.Web.Entities;
 
 namespace AfetErkenUyari.Web.Models;
@@ -54,6 +55,19 @@ public class ToplanmaAlaniFormModel
     public List<Bolge> Bolgeler { get; set; } = new();
     /// <summary>Hafta 9: harita servisinin bulduğu adres (bilgi amaçlı).</summary>
     public string? BulunanAdres { get; set; }
+}
+
+/// <summary>Hafta 11: harita ve en yakın toplanma alanı sayfası.</summary>
+public class ToplanmaHaritasiModel
+{
+    public List<Bolge> Bolgeler { get; set; } = new();
+    public List<ToplanmaAlani> Alanlar { get; set; } = new();
+    public EnYakinSonucu? Sonuc { get; set; }
+    public int? BolgeId { get; set; }
+    public string? Adres { get; set; }
+    public decimal? Enlem { get; set; }
+    public decimal? Boylam { get; set; }
+    public bool Aboneliklerim { get; set; }
 }
 
 public class RehberSayfaModel

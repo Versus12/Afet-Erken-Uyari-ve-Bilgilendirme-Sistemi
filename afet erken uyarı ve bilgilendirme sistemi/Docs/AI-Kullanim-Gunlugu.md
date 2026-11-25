@@ -20,6 +20,8 @@
 | | 10 | | Sade uyarı için sistem istemi (prompt) ve JSON şeması tasarımı | `SadeUyariIstemi` | |
 | | 10 | | Anthropic C# SDK ile Claude çağrısı, hata türleri, yedek model | `ClaudeIstemcisi` | |
 | | 10 | | AI çıktısını doğrulama kuralları (uydurma sayı, bölge adı, cümle uzunluğu) | `CiktiDogrulayici` | |
+| | 11 | | Haversine formülü ve en yakın alan sıralaması | `KonumHesap`, `ToplanmaAlaniManager.EnYakinlar` | |
+| | 11 | | Leaflet + OpenStreetMap harita sayfası, WebView2 ile masaüstüne gömme | `HaritaSayfasi`, `FrmToplanmaHaritasi`, `Harita.cshtml` | |
 | | 10 | | AI yokken çalışan kural tabanlı özetleyici | `KuralTabanliOzetleyici` (kurum adındaki "Acil" kelimesi hatası testte bulunup düzeltildi) | |
 
 ## Sözlüde açıklamaya hazırlanılacak AI kaynaklı parçalar
@@ -34,6 +36,8 @@
 9. `SadeUyariIstemi.Sistem` — her kuralın neden konduğu; kaynağın neden etiket içinde verildiği (Hafta 10).
 10. `CiktiDogrulayici.IcerigiDogrula` — uydurma sayı kontrolü, bölge adı kontrolü, uyarı/hata ayrımı (Hafta 10).
 11. `SadeUyariManager.TaslakUret` — AI → doğrulama → kural tabanlı yedek → günlük akışı (Hafta 10).
+12. `KonumHesap.MesafeKm` — Haversine formülünün her satırı (radyan dönüşümü, a, atan2) (Hafta 11).
+13. `ToplanmaAlaniManager.Kaydet` — koordinat zorunluluğu ve 50 km kuralı (Hafta 11).
 
 > Hafta 10'un uygulama içindeki AI günlüğü (istem + ham çıktı + doğrulama) `YapayZekaKayitlari` tablosunda tutulur ve
 > masaüstünde *Uyarı Yayını → Yapay Zekâ Günlüğü*, web'de `/Uyari/YapayZekaGunlugu` sayfasından okunur.

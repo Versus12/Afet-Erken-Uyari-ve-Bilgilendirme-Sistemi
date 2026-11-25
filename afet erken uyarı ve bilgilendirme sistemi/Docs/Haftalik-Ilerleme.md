@@ -86,12 +86,22 @@ Teknoloji: C#, .NET Framework 4.7.2, Windows Forms, Microsoft SQL Server, ADO.NE
 - [x] Proje paket yapısı `packages.config` → `PackageReference`'a taşındı (SDK bağımlılıkları için); C# dil sürümü `latest`.
 - [x] Test: masaüstü 23/23 + 9 form, web 12/12 (anahtarsız) ve 12/12 (geçersiz anahtarla gerçek Claude çağrısı → 401 → kural tabanlı yedek).
 
+## Hafta 11 · İleri Modül: Toplanma Alanı Haritası Modülü ✅
+**Teslim:** Çalışan Toplanma Alanı Haritası Modülü · İlgili kod ve kısa açıklama
+
+- [x] **Toplanma alanı modeli:** `ToplanmaAlanlari` (bölgeye bağlı, adres, kapasite, enlem/boylam). Örnek veriye her bölge için koordinatlı alan eklendi (9 alan).
+- [x] **En yakın hesaplama:** `KonumHesap.MesafeKm` — Haversine formülü (R = 6371 km); `ToplanmaAlaniManager.EnYakinlar` alanları mesafeye göre sıralar (eşitlikte büyük kapasite önce), en yakın 3 alanı mesafe ve tahmini yürüme süresiyle (4,5 km/sa) döndürür.
+- [x] **Konum girişi:** bölge merkezi, adres (Hafta 9 harita API'si / Nominatim), enlem-boylam; web'de ayrıca tarayıcı konumu ("Konumumu kullan") ve haritaya tıklama.
+- [x] **Harita gösterimi:** Leaflet 1.9.4 + OpenStreetMap. Masaüstünde Microsoft Edge WebView2 bileşeni içinde (`FrmToplanmaHaritasi`), web'de `/ToplanmaAlani/Harita`. En yakın alan kırmızı, diğer 2 yakın alan turuncu; konumdan en yakına kesikli çizgi.
+- [x] **İş kuralları:** (1) haritada gösterilebilmesi için koordinat zorunlu; (2) alan, bölgesinin merkezine en fazla 50 km uzakta olmalı (yanlış bölge / ters yazılmış koordinat yakalanır); (3) en yakın alan 10 km'den uzaksa uyarı; (4) koordinatsız eski kayıtlar hesaba katılmaz ve sayısı bildirilir; (5) enlem/boylam aralık kontrolü.
+- [x] **Entegrasyon:** abonelik modülü ("yalnızca abone olduğum bölgeler" filtresi, varsayılan konum = abone olunan ilk bölge), Hafta 9 harita API'si (adres → koordinat), toplanma alanı yönetimi (kayıt kuralları).
+- [x] Test: masaüstü 23/23 (Haversine bilinen mesafeler: İstanbul-Ankara 349 km, Bingöl-Elazığ 113 km), WebView2 haritası görüntüyle doğrulandı; web 14/14 + tarayıcıda haritaya tıklama. Hafta 9 ve 10 testleri yeniden geçti.
+
 ---
 
-## Sonraki aşama planı (Hafta 11+)
+## Sonraki aşama planı (Hafta 12+)
 | Hafta | Plan |
 |---|---|
-| 11 | En yakın toplanma alanı hesabı (Haversine) ve harita gösterimi |
 | 12 | Yönetim panosu: abonelik/uyarı istatistikleri, grafik, CSV dışa aktarma |
 | 13 | Birim + entegrasyon testleri (MSTest), hata listesi |
 | 14–15 | Dokümantasyon, arayüz iyileştirme, final sürüm `v1.0.0` |

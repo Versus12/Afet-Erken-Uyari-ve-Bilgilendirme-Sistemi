@@ -41,6 +41,7 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
             this.btnSil = new System.Windows.Forms.Button();
             this.btnKonumBul = new System.Windows.Forms.Button();
             this.btnHaritadaAc = new System.Windows.Forms.Button();
+            this.btnEnYakin = new System.Windows.Forms.Button();
             this.pnlUst.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvAlanlar)).BeginInit();
             this.grpDuzenle.SuspendLayout();
@@ -53,6 +54,7 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
             this.pnlUst.Controls.Add(this.cmbFiltre);
             this.pnlUst.Controls.Add(this.chkAboneliklerim);
             this.pnlUst.Controls.Add(this.btnHaritadaAc);
+            this.pnlUst.Controls.Add(this.btnEnYakin);
             this.pnlUst.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlUst.Location = new System.Drawing.Point(0, 0);
             this.pnlUst.Name = "pnlUst";
@@ -278,6 +280,20 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
             this.btnHaritadaAc.UseVisualStyleBackColor = true;
             this.btnHaritadaAc.Click += new System.EventHandler(this.btnHaritadaAc_Click);
             //
+            // btnEnYakin
+            //
+            this.btnEnYakin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnEnYakin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(128)))), ((int)(((byte)(185)))));
+            this.btnEnYakin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnEnYakin.ForeColor = System.Drawing.Color.White;
+            this.btnEnYakin.Location = new System.Drawing.Point(560, 8);
+            this.btnEnYakin.Name = "btnEnYakin";
+            this.btnEnYakin.Size = new System.Drawing.Size(178, 28);
+            this.btnEnYakin.TabIndex = 4;
+            this.btnEnYakin.Text = "Harita ve En Yakın Alan";
+            this.btnEnYakin.UseVisualStyleBackColor = false;
+            this.btnEnYakin.Click += new System.EventHandler(this.btnEnYakin_Click);
+            //
             // FrmToplanmaAlanlari
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -331,5 +347,6 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
         private System.Windows.Forms.Button btnSil;
         private System.Windows.Forms.Button btnKonumBul;
         private System.Windows.Forms.Button btnHaritadaAc;
+        private System.Windows.Forms.Button btnEnYakin;
     }
 }

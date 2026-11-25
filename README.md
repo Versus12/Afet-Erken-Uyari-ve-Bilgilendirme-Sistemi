@@ -3,7 +3,7 @@
 Vatandaşların bölge bazlı afet uyarılarını ve hazırlık yönergelerini tek bir yerden almasını sağlayan,
 yerel yönetimlerin de uyarı yayınlayabildiği **Windows Forms (.NET Framework 4.7.2)** masaüstü uygulaması.
 
-> Bilgisayar Uygulamaları I – Proje Tabanlı Ders · **P14** · Sürüm **v0.10.0 (Hafta 3–10)**
+> Bilgisayar Uygulamaları I – Proje Tabanlı Ders · **P14** · Sürüm **v0.11.0 (Hafta 3–11)**
 
 Çözümde iki istemci vardır; ikisi de aynı SQL Server veritabanını (`AfetBilgilendirme`) kullanır:
 
@@ -25,6 +25,7 @@ Web sitesinin kurulumu ve sayfaları için: [AfetErkenUyari.Web/README.md](AfetE
 | Yapay zekâ: kurum duyurusundan bölgeye özel sade uyarı taslağı (Claude) + doğrulama + AI günlüğü — Hafta 10 | – | ✅ |
 | Hazırlık rehberi (afet türü × önce/sırasında/sonra) | okur | okur + düzenler |
 | Toplanma alanları (bölge filtresi, kapasite) | okur | okur + düzenler |
+| Toplanma alanı haritası + en yakın alan (Haversine; bölge / adres / koordinat / tarayıcı konumu) — Hafta 11 | ✅ | ✅ |
 | Bölge yönetimi | – | ✅ |
 | Uyarı yayını (çoklu bölge hedefleme, geçerlilik süresi, yayından kaldırma) | – | ✅ |
 
@@ -83,7 +84,7 @@ Veritabanı adı: **AfetBilgilendirme** — Tablolar: `Kullanicilar`, `Bolgeler`
 `YapayZekaKayitlari` (Hafta 10 — AI günlüğü: istem, ham çıktı, doğrulama).
 
 ## Proje belgeleri
-- [Haftalık ilerleme (Hafta 3–10)](afet%20erken%20uyar%C4%B1%20ve%20bilgilendirme%20sistemi/Docs/Haftalik-Ilerleme.md)
+- [Haftalık ilerleme (Hafta 3–11)](afet%20erken%20uyar%C4%B1%20ve%20bilgilendirme%20sistemi/Docs/Haftalik-Ilerleme.md)
 - [Güvenlik notu](afet%20erken%20uyar%C4%B1%20ve%20bilgilendirme%20sistemi/Docs/Guvenlik-Notu.md)
 - [Vize ilerleme raporu](afet%20erken%20uyar%C4%B1%20ve%20bilgilendirme%20sistemi/Docs/Vize-Ilerleme-Raporu.md)
 - [Demo senaryosu](afet%20erken%20uyar%C4%B1%20ve%20bilgilendirme%20sistemi/Docs/Demo-Senaryosu.md)
@@ -91,5 +92,4 @@ Veritabanı adı: **AfetBilgilendirme** — Tablolar: `Kullanicilar`, `Bolgeler`
 - [Sözlü sınav hazırlık](afet%20erken%20uyar%C4%B1%20ve%20bilgilendirme%20sistemi/Docs/Sozlu-Sinav-Hazirlik.md)
 
 ## Geliştirme durumu
-Hafta 3–10 tamamlandı (vize ara sürümü `v0.8.0`, Hafta 9 `v0.9.0`, Hafta 10 `v0.10.0`). Sıradaki:
-en yakın toplanma alanı (H11), yönetim panosu (H12).
+Hafta 3–11 tamamlandı (vize ara sürümü `v0.8.0`, Hafta 9 `v0.9.0`, Hafta 10 `v0.10.0`, Hafta 11 `v0.11.0`). Sıradaki:, yönetim panosu (H12).

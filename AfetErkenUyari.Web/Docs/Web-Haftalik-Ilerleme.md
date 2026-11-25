@@ -1,6 +1,6 @@
-# Web Sitesi — Haftalık İlerleme (Hafta 3 – 10)
+# Web Sitesi — Haftalık İlerleme (Hafta 3 – 11)
 
-Kaynak: *P14 — Afet Erken Uyarı ve Bilgilendirme Sistemi* ders paketi. Hafta 11 ve sonrası bu sürümün kapsamı dışındadır.
+Kaynak: *P14 — Afet Erken Uyarı ve Bilgilendirme Sistemi* ders paketi. Hafta 12 ve sonrası bu sürümün kapsamı dışındadır.
 
 ## Hafta 3 · Kurulum, Mimari ve Veri Modeli ✅
 - [x] Visual Studio 2022 + .NET 9 SDK, ASP.NET Core MVC proje iskeleti (`AfetErkenUyari.Web`), çözüme eklendi
@@ -60,6 +60,13 @@ Kaynak: *P14 — Afet Erken Uyarı ve Bilgilendirme Sistemi* ders paketi. Hafta 
 - [x] AI günlüğü: `/Uyari/YapayZekaGunlugu` (istem, ham çıktı, doğrulama notları)
 - [x] Hata düzeltmesi: "Taslak üret" düğmesi yayın onay penceresini açıyordu; onay artık yalnızca "Uyarıyı Yayınla" için soruluyor
 - [x] HTTP testleri: anahtarsız 12/12, geçersiz anahtarla (gerçek Claude çağrısı → 401 → kural tabanlı yedek) 12/12
+
+## Hafta 11 · İleri Modül: Toplanma Alanı Haritası ✅
+- [x] `/ToplanmaAlani/Harita`: Leaflet 1.9.4 (SRI bütünlük kontrolüyle) + OpenStreetMap haritası, en yakın 3 alan listesi (mesafe, yürüme süresi)
+- [x] Konum: bölge merkezi, adres (Nominatim), "Konumumu kullan" (tarayıcı konumu; https veya localhost), haritaya tıklama
+- [x] `KonumHesap` (Haversine) ve `ToplanmaAlaniManager.EnYakinlar`; koordinat zorunlu ve bölgeye en fazla 50 km kuralı, 10 km uyarısı
+- [x] Harita verisi sayfaya JSON olarak gömülür; açılır pencere metinleri `textContent` ile eklenir (XSS'e karşı)
+- [x] HTTP testleri 14/14 + tarayıcıda harita ve tıklama
 
 ### Vize öncesi tarayıcıda denenen senaryolar (hepsi beklendiği gibi)
 | Senaryo | Sonuç |

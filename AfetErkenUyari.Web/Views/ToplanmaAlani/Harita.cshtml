@@ -1,0 +1,180 @@
+@model ToplanmaHaritasiModel
+@using System.Globalization
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Toplanma Alanı Haritası";
+    var s = Model.Sonuc;
+    var ic = CultureInfo.InvariantCulture;
+    var yakinIdler = s?.Alanlar.Select(y => y.Alan.AlanId).ToHashSet() ?? new HashSet<int>();
+    int? ilk = s?.Alanlar.FirstOrDefault()?.Alan.AlanId;
+    // Harita verisi JSON olarak sayfaya gömülür (JsonSerializer < > gibi karakterleri kaçırır).
+    var haritaVerisi = new
+    {
+        alanlar = Model.Alanlar.Where(a => a.Enlem.HasValue && a.Boylam.HasValue).Select(a => new
+        {
+            ad = a.AlanAdi,
+            bolge = a.BolgeAdi,
+            kapasite = a.Kapasite,
+            e = a.Enlem,
+            b = a.Boylam,
+            yakin = yakinIdler.Contains(a.AlanId),
+            ilk = ilk == a.AlanId,
+            km = s?.Alanlar.FirstOrDefault(y => y.Alan.AlanId == a.AlanId)?.MesafeKm
+        }),
+        konum = s == null ? null : new { e = s.Enlem, b = s.Boylam, ad = s.KonumAciklamasi }
+    };
+    string Mesafe(double km) => km < 1 ? $"{km * 1000:0} m" : $"{km:0.0} km";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h3 mb-0">Toplanma Alanı Haritası</h1>
+    <a class="btn btn-outline-secondary btn-sm" asp-controller="ToplanmaAlani" asp-action="Index">Liste görünümü</a>
+</div>
+
+<div class="kart mb-3">
+    <div class="row g-2 align-items-end">
+        <form class="col-lg-4 d-flex gap-2 align-items-end" method="get" asp-action="Harita">
+            <div class="flex-grow-1">
+                <label for="bolgeId" class="form-label small mb-1">Bölge merkezi</label>
+                <select id="bolgeId" name="bolgeId" class="form-select form-select-sm">
+                    @foreach (var b in Model.Bolgeler)
+                    {
+                        <option value="@b.BolgeId" selected="@(b.BolgeId == Model.BolgeId && Model.Enlem == null && string.IsNullOrEmpty(Model.Adres))">@b.BolgeAdi</option>
+                    }
+                </select>
+            </div>
+            <input type="hidden" name="aboneliklerim" value="@Model.Aboneliklerim.ToString().ToLower()" />
+            <button class="btn btn-sm btn-outline-primary text-nowrap" type="submit">Bölgeden bul</button>
+        </form>
+        <form class="col-lg-5 d-flex gap-2 align-items-end" method="get" asp-action="Harita">
+            <div class="flex-grow-1">
+                <label for="adres" class="form-label small mb-1">Adres (ör. "Bingöl Üniversitesi, Bingöl")</label>
+                <input id="adres" name="adres" value="@Model.Adres" class="form-control form-control-sm" maxlength="200" />
+            </div>
+            <input type="hidden" name="aboneliklerim" value="@Model.Aboneliklerim.ToString().ToLower()" />
+            <button class="btn btn-sm btn-outline-primary text-nowrap" type="submit">Adresten bul</button>
+        </form>
+        <div class="col-lg-3 d-flex flex-column gap-1">
+            <button id="konumumuKullan" class="btn btn-sm btn-primary" type="button">📍 Konumumu kullan</button>
+            <div class="form-check small mb-0">
+                <input class="form-check-input" type="checkbox" id="aboneliklerimKutu" @(Model.Aboneliklerim ? "checked" : "") />
+                <label class="form-check-label" for="aboneliklerimKutu">Yalnızca abone olduğum bölgeler</label>
+            </div>
+        </div>
+    </div>
+    <p class="small text-muted mt-2 mb-0">İpucu: haritada herhangi bir noktaya tıklayarak da o noktaya en yakın alanları bulabilirsiniz.</p>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-4">
+        <div class="kart h-100">
+            <div class="kart-baslik">En yakın toplanma alanları</div>
+            @if (s == null)
+            {
+                <p class="text-muted small mb-0">Konumunuzu seçin.</p>
+            }
+            else
+            {
+                <p class="small mb-2">
+                    <strong>Konum:</strong> @s.KonumAciklamasi<br />
+                    <span class="text-muted">(@s.Enlem.ToString("0.#####", ic), @s.Boylam.ToString("0.#####", ic))</span>
+                </p>
+                @if (!string.IsNullOrEmpty(s.Uyari))
+                {
+                    <div class="alert alert-warning small py-2">@s.Uyari</div>
+                }
+                <ol class="list-group list-group-numbered mb-2">
+                    @foreach (var y in s.Alanlar)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-start @(y.Alan.AlanId == ilk ? "list-group-item-warning" : "")">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-semibold">@y.Alan.AlanAdi</div>
+                                <div class="small text-muted">@y.Alan.BolgeAdi · @y.Alan.Adres · kapasite @y.Alan.Kapasite.ToString("N0")</div>
+                            </div>
+                            <span class="text-end small text-nowrap">
+                                <strong>@Mesafe(y.MesafeKm)</strong><br />
+                                @(y.YurumeDakika > 180 ? "" : $"~{y.YurumeDakika} dk yürüyüş")
+                            </span>
+                        </li>
+                    }
+                </ol>
+                @if (s.KonumsuzAlanSayisi > 0)
+                {
+                    <p class="small text-muted mb-1">Koordinatı olmayan @s.KonumsuzAlanSayisi alan hesaba katılmadı.</p>
+                }
+                <p class="small text-muted mb-0">Mesafeler kuş uçuşudur (Haversine formülü); yürüme süresi 4,5 km/sa ile tahminidir.</p>
+            }
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div id="harita" class="harita-kutusu" role="region" aria-label="Toplanma alanları haritası"></div>
+    </div>
+</div>
+
+@section Head {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+}
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        (function () {
+            const veri = @Html.Raw(JsonSerializer.Serialize(haritaVerisi));
+            const aboneKutu = document.getElementById("aboneliklerimKutu");
+            const git = (parametreler) => {
+                parametreler.aboneliklerim = aboneKutu.checked;
+                location.href = "@Url.Action("Harita")?" + new URLSearchParams(parametreler).toString();
+            };
+
+            const harita = L.map("harita");
+            L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                maxZoom: 19, attribution: "&copy; OpenStreetMap katkıcıları"
+            }).addTo(harita);
+
+            let ilkIsaret = null;
+            const tumu = [];
+            veri.alanlar.forEach(a => {
+                const renk = a.ilk ? "#c0392b" : (a.yakin ? "#e67e22" : "#2c3e50");
+                const m = L.circleMarker([a.e, a.b], { radius: a.ilk ? 11 : 8, color: renk, fillColor: renk, fillOpacity: 0.85 }).addTo(harita);
+                const p = document.createElement("div");   // metin textContent ile eklenir (XSS'e karşı)
+                const b = document.createElement("b"); b.textContent = a.ad; p.appendChild(b);
+                p.appendChild(document.createElement("br")); p.appendChild(document.createTextNode(a.bolge + " · kapasite " + a.kapasite.toLocaleString("tr-TR")));
+                if (a.km !== null) { p.appendChild(document.createElement("br")); p.appendChild(document.createTextNode(a.km.toFixed(2).replace(".", ",") + " km")); }
+                m.bindPopup(p);
+                if (a.ilk) ilkIsaret = m;
+                tumu.push([a.e, a.b]);
+            });
+
+            if (veri.konum) {
+                L.marker([veri.konum.e, veri.konum.b]).addTo(harita).bindTooltip(veri.konum.ad, { permanent: true, direction: "top" });
+                const odak = [[veri.konum.e, veri.konum.b]];
+                veri.alanlar.filter(a => a.yakin).forEach(a => odak.push([a.e, a.b]));
+                veri.alanlar.filter(a => a.ilk).forEach(a =>
+                    L.polyline([[veri.konum.e, veri.konum.b], [a.e, a.b]], { color: "#c0392b", dashArray: "6 6" }).addTo(harita));
+                harita.fitBounds(odak, { padding: [40, 40], maxZoom: 15 });
+            } else if (tumu.length) {
+                harita.fitBounds(tumu, { padding: [30, 30], maxZoom: 13 });
+            } else {
+                harita.setView([39.0, 35.0], 6);
+            }
+            if (ilkIsaret) ilkIsaret.openPopup();
+
+            // Haritaya tıklanan noktadan en yakın alanlar
+            harita.on("click", e => git({ enlem: e.latlng.lat.toFixed(6), boylam: e.latlng.lng.toFixed(6), kaynak: "harita" }));
+
+            // Tarayıcının konum izni (yalnızca https veya localhost'ta çalışır)
+            document.getElementById("konumumuKullan").addEventListener("click", () => {
+                if (!navigator.geolocation) { alert("Tarayıcınız konum bilgisini desteklemiyor."); return; }
+                navigator.geolocation.getCurrentPosition(
+                    k => git({ enlem: k.coords.latitude.toFixed(6), boylam: k.coords.longitude.toFixed(6), kaynak: "tarayici" }),
+                    () => alert("Konum alınamadı. Tarayıcıda konum iznini verin ya da adres/bölge ile arayın."),
+                    { enableHighAccuracy: true, timeout: 10000 });
+            });
+            aboneKutu.addEventListener("change", () => {
+                const u = new URL(location.href); u.searchParams.set("aboneliklerim", aboneKutu.checked); location.href = u.toString();
+            });
+        })();
+    </script>
+}

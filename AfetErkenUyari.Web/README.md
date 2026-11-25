@@ -1,6 +1,6 @@
 # Afet Erken Uyarı ve Bilgilendirme Sistemi — Web Sitesi
 
-P14 projesinin **ASP.NET Core MVC (.NET 9, C#)** ile hazırlanmış web sürümü. Kapsam: **Hafta 3 – 10** (sürüm `v0.10.0`).
+P14 projesinin **ASP.NET Core MVC (.NET 9, C#)** ile hazırlanmış web sürümü. Kapsam: **Hafta 3 – 11** (sürüm `v0.11.0`).
 Masaüstü (Windows Forms) uygulamasıyla **aynı veritabanını** (`AfetBilgilendirme`) kullanır; yönetici web'den
 uyarı yayınlarsa vatandaş masaüstü uygulamasında da görür.
 
@@ -15,6 +15,7 @@ uyarı yayınlarsa vatandaş masaüstü uygulamasında da görür.
 | Yapay zekâ ile sade uyarı taslağı (Claude) + doğrulama + AI günlüğü — Hafta 10 | – | ✅ | `/Uyari`, `/Uyari/YapayZekaGunlugu` |
 | Hazırlık rehberi (afet türü × önce / sırasında / sonra) | okur | okur + düzenler | `/Rehber` |
 | Toplanma alanları (bölge ve "abone olduğum bölgeler" filtresi) | okur | okur + düzenler | `/ToplanmaAlani` |
+| Toplanma alanı haritası + en yakın alan (Leaflet + OpenStreetMap, Haversine) — Hafta 11 | ✅ | ✅ | `/ToplanmaAlani/Harita` |
 | Bölge yönetimi | – | ✅ | `/Bolge` |
 | Uyarı yayını (çoklu bölge hedefleme, geçerlilik süresi, yayından kaldırma) | – | ✅ | `/Uyari` |
 
@@ -62,7 +63,7 @@ tanımlı değilse e-postalar `%LOCALAPPDATA%\AfetErkenUyari\GidenEpostalar` kla
 | `vatandas2` | `Vatandas123!` | Vatandaş |
 
 ## Belgeler
-- [Haftalık ilerleme (Hafta 3–10, web)](Docs/Web-Haftalik-Ilerleme.md)
+- [Haftalık ilerleme (Hafta 3–11, web)](Docs/Web-Haftalik-Ilerleme.md)
 - [Mimari ve güvenlik notu](Docs/Web-Mimari-ve-Guvenlik.md)
 - [Vize demo senaryosu (web)](Docs/Web-Demo-Senaryosu.md)
 - Ortak: ER diyagramı, veritabanı scriptleri, AI kullanım günlüğü → `../afet erken uyarı ve bilgilendirme sistemi/Docs`

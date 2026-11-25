@@ -17,6 +17,40 @@ public class ToplanmaAlaniController(ToplanmaAlaniManager manager, BolgeManager 
         Alanlar = manager.Listele(Kullanici, bolgeId, aboneliklerim)
     });
 
+    /// <summary>
+    /// Hafta 11: harita ve en yakın toplanma alanı. Konum dört yoldan gelir: tarayıcı konumu / haritaya tıklama
+    /// (enlem+boylam), yazılan adres (Hafta 9 harita API'si) ya da bölge merkezi.
+    /// </summary>
+    [HttpGet]
+    public IActionResult Harita(decimal? enlem, decimal? boylam, int? bolgeId, string? adres, string? kaynak, bool aboneliklerim = false)
+    {
+        var model = new ToplanmaHaritasiModel
+        {
+            Bolgeler = bolgeManager.Listele(),
+            BolgeId = bolgeId,
+            Adres = adres,
+            Enlem = enlem,
+            Boylam = boylam,
+            Aboneliklerim = aboneliklerim
+        };
+        try
+        {
+            if (enlem is { } e && boylam is { } b)
+                model.Sonuc = manager.EnYakinlar(Kullanici, e, b, kaynak == "tarayici" ? "Bulunduğunuz konum" : "Haritada seçilen nokta", aboneliklerim);
+            else if (!string.IsNullOrWhiteSpace(adres))
+                model.Sonuc = manager.AdrestenEnYakinlar(Kullanici, adres, aboneliklerim);
+            else if ((bolgeId ?? manager.IlkAbonelikBolgesi(Kullanici)) is { } bid)
+            {
+                model.BolgeId = bid;
+                model.Sonuc = manager.BolgeMerkezindenEnYakinlar(Kullanici, bid, aboneliklerim);
+            }
+        }
+        catch (IsKuraliHatasi ex) { Hata(ex.Message); }
+
+        model.Alanlar = manager.Listele(Kullanici, null, aboneliklerim);
+        return View(model);
+    }
+
     [HttpGet, Authorize(Policy = "Yonetici")]
     public IActionResult Duzenle(int? id)
     {

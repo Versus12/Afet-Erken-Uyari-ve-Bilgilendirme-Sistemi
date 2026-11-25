@@ -37,3 +37,7 @@ body { background: #f5f7fa; }
 .btn-ai { background: #8e44ad; border-color: #8e44ad; color: #fff; }
 .btn-ai:hover, .btn-ai:focus { background: #6c3483; border-color: #6c3483; color: #fff; }
 .istem-kutusu { white-space: pre-wrap; font-family: Consolas, monospace; font-size: .8rem; max-height: 320px; overflow: auto; }
+
+/* Hafta 11: toplanma alanı haritası */
+.harita-kutusu { height: 560px; border-radius: .75rem; border: 1px solid #dee2e6; }
+@media (max-width: 991px) { .harita-kutusu { height: 420px; } }

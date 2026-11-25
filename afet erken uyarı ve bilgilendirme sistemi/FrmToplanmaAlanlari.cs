@@ -10,7 +10,7 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
     /// <summary>
     /// Toplanma alanları listesi (bölge filtreli). Yönetici alan ekleyip düzenleyebilir.
     /// Hafta 9: adresten koordinat bulma (Nominatim API) ve alanı OpenStreetMap'te açma.
-    /// Uygulama içi harita modülü ve en yakın alan hesabı Hafta 11 kapsamındadır.
+    /// Hafta 11: "Harita ve En Yakın Alan" düğmesi FrmToplanmaHaritasi'nı açar (harita + Haversine ile en yakın alan).
     /// </summary>
     public partial class FrmToplanmaAlanlari : Form
     {
@@ -142,6 +142,13 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
             txtBoylam.Text = ArayuzYardimci.OndalikYaz(konum.Boylam);
             ArayuzYardimci.Bilgi("Konum bulundu:\n" + konum.BulunanAdres +
                                  "\n\nKoordinatlar alanlara yazıldı. Kaydetmek için \"Kaydet\"e basınız.");
+        }
+
+        /// <summary>Hafta 11: harita ve en yakın toplanma alanı ekranı.</summary>
+        private void btnEnYakin_Click(object sender, EventArgs e)
+        {
+            using (FrmToplanmaHaritasi frm = new FrmToplanmaHaritasi())
+                frm.ShowDialog(this);
         }
 
         /// <summary>Seçili alanı tarayıcıda OpenStreetMap haritasında gösterir.</summary>
