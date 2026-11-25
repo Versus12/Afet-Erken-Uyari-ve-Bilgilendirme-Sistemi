@@ -1,5 +1,5 @@
 # Afet Erken Uyarı ve Bilgilendirme Sistemi
-## ER Diyagramı (Hafta 3 – güncellendi Hafta 8)
+## ER Diyagramı (Hafta 3 – güncellendi Hafta 10)
 
 ```mermaid
 erDiagram
@@ -9,6 +9,9 @@ erDiagram
     UYARILAR     ||--|{ UYARI_BOLGELERI : "hedeflenir"
     BOLGELER     ||--o{ UYARI_BOLGELERI : "uyarı alır"
     BOLGELER     ||--o{ TOPLANMA_ALANLARI : "içerir"
+    UYARILAR     ||--o{ BILDIRIMLER : "e-postası gönderilir"
+    KULLANICILAR ||--o{ BILDIRIMLER : "e-posta alır"
+    KULLANICILAR ||--o{ YAPAY_ZEKA_KAYITLARI : "taslak üretir (yönetici)"
 
     KULLANICILAR {
         int Id PK
@@ -32,7 +35,7 @@ erDiagram
         int AbonelikId PK
         int KullaniciId FK
         int BolgeId FK
-        nvarchar BildirimKanali "Uygulama | SMS | Eposta"
+        nvarchar BildirimKanali "Uygulama | Eposta"
         tinyint MinSeviye "1-4"
         datetime AboneTarihi
         bit AktifMi
@@ -51,6 +54,32 @@ erDiagram
     UYARI_BOLGELERI {
         int UyariId PK, FK
         int BolgeId PK, FK
+    }
+    YAPAY_ZEKA_KAYITLARI {
+        int KayitId PK
+        int KullaniciId FK
+        datetime Tarih
+        nvarchar Saglayici "Claude (model) | Kural tabanlı"
+        nvarchar HedefBolgeler
+        nvarchar KaynakMetin
+        nvarchar Istem "prompt"
+        nvarchar HamCikti
+        nvarchar Baslik
+        nvarchar Mesaj
+        tinyint OnerilenSeviye
+        bit Gecerli
+        nvarchar DogrulamaNotlari
+    }
+    BILDIRIMLER {
+        int BildirimId PK
+        int UyariId FK
+        int KullaniciId FK
+        nvarchar Kanal "Eposta"
+        nvarchar Alici "kayıtlı e-posta"
+        nvarchar Durum "Bekliyor | Gonderildi | DenemeModu | Basarisiz"
+        tinyint DenemeSayisi
+        nvarchar SonHata
+        datetime GonderimTarihi
     }
     HAZIRLIK_REHBERI {
         int RehberId PK

@@ -31,6 +31,9 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
             ArayuzYardimci.Kolon(dgvAbonelikler, "AboneTarihi", "Tarih", 85, "dd.MM.yyyy");
 
             cmbKanal.Items.AddRange(BildirimKanallari.Tumu);
+            // Listede "Eposta" yerine "E-posta" yazsın (kayıtta kod değeri tutulur).
+            cmbKanal.FormattingEnabled = true;
+            cmbKanal.Format += (s, ev) => ev.Value = BildirimKanallari.Ad(ev.ListItem as string);
             cmbKanal.SelectedIndex = 0;
             for (int s = UyariSeviyeleri.EnDusuk; s <= UyariSeviyeleri.EnYuksek; s++)
                 cmbMinSeviye.Items.Add(s + " - " + UyariSeviyeleri.Ad(s));
@@ -52,7 +55,7 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
             public Abonelik Kayit { get; set; }
             public string BolgeAdi { get { return Kayit.BolgeAdi; } }
             public int RiskSeviyesi { get { return Kayit.RiskSeviyesi; } }
-            public string BildirimKanali { get { return Kayit.BildirimKanali; } }
+            public string BildirimKanali { get { return BildirimKanallari.Ad(Kayit.BildirimKanali); } }
             public string MinSeviyeAdi { get { return UyariSeviyeleri.Ad(Kayit.MinSeviye); } }
             public string Durum { get { return Kayit.AktifMi ? "Aktif" : "Durduruldu"; } }
             public DateTime AboneTarihi { get { return Kayit.AboneTarihi; } }
@@ -63,7 +66,9 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
             List<Abonelik> liste = null;
             if (!ArayuzYardimci.Calistir(this, () => liste = _abonelikManager.Aboneliklerim())) return;
             dgvAbonelikler.DataSource = liste.Select(a => new AbonelikSatiri { Kayit = a }).ToList();
-            lblToplam.Text = liste.Count + " / " + AbonelikManager.MaksimumAbonelik + " bölgeye abonesiniz";
+            // E-posta bildirimleri hesabın kayıtlı adresine gider (ayrı bir mail adresi yok).
+            lblToplam.Text = liste.Count + " / " + AbonelikManager.MaksimumAbonelik + " bölgeye abonesiniz   |   E-posta bildirimleri: " +
+                             (Oturum.AktifKullanici != null ? Oturum.AktifKullanici.Eposta : "");
             SecimDegisti();
         }
 

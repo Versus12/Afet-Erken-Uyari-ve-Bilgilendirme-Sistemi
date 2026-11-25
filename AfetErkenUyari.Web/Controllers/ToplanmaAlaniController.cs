@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AfetErkenUyari.Web.Controllers;
 
-/// <summary>Toplanma alanları listesi; yönetici ekler/düzenler. (Harita Hafta 11 kapsamındadır.)</summary>
+/// <summary>Toplanma alanları listesi; yönetici ekler/düzenler. Hafta 9: adresten konum bulma (Nominatim) ve haritada açma.</summary>
 [Authorize]
-public class ToplanmaAlaniController(ToplanmaAlaniManager manager, BolgeManager bolgeManager) : TemelController
+public class ToplanmaAlaniController(ToplanmaAlaniManager manager, BolgeManager bolgeManager, HaritaServisi harita) : TemelController
 {
     public IActionResult Index(int? bolgeId, bool aboneliklerim = false) => View(new ToplanmaAlaniSayfaModel
     {
@@ -41,6 +41,32 @@ public class ToplanmaAlaniController(ToplanmaAlaniManager manager, BolgeManager 
         if (yasak) return Yasak();
         model.Bolgeler = bolgeManager.Listele();
         return View(model);
+    }
+
+    /// <summary>Hafta 9 - Harita API: formdaki adresi koordinata çevirip formu yeniden gösterir (henüz kaydetmez).</summary>
+    [HttpPost, Authorize(Policy = "Yonetici")]
+    public IActionResult KonumBul(ToplanmaAlaniFormModel model)
+    {
+        model.Bolgeler = bolgeManager.Listele();
+        var bolge = model.Bolgeler.FirstOrDefault(b => b.BolgeId == model.Alan.BolgeId);
+        // Aramayı netleştirmek için bölgenin il/ilçesi adrese eklenir.
+        string aranan = (model.Alan.Adres ?? "").Trim();
+        if (bolge != null && !aranan.Contains(bolge.Il, StringComparison.CurrentCultureIgnoreCase))
+            aranan += $", {bolge.Ilce}, {bolge.Il}";
+
+        try
+        {
+            var konum = harita.AdresBul(aranan);
+            model.Alan.Enlem = konum.Enlem;
+            model.Alan.Boylam = konum.Boylam;
+            model.BulunanAdres = konum.BulunanAdres;
+        }
+        catch (IsKuraliHatasi ex)
+        {
+            Hata(ex.Message);   // TempData aynı istekte de okunur; sayfanın üstünde gösterilir.
+        }
+        ModelState.Clear();
+        return View(nameof(Duzenle), model);
     }
 
     [HttpPost, Authorize(Policy = "Yonetici")]

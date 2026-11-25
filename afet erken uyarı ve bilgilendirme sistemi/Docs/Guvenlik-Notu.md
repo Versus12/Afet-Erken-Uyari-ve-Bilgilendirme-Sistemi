@@ -18,4 +18,6 @@
 ## Bilinen sınırlamalar (sonraki haftalar)
 - Kilit sayacı bellekte tutulur; uygulama yeniden başlatılınca sıfırlanır (kalıcı kilit için tabloya taşınabilir).
 - Parola sıfırlama / değiştirme ekranı yok.
-- Hafta 9'da eklenecek API anahtarları ortam değişkeninde tutulacak, depoya eklenmeyecek.
+- API anahtarları (Hafta 9) yalnızca ortam değişkeninde tutulur (`AFET_EPOSTA_API_ANAHTARI`); koda, `App.config`'e ve depoya yazılmaz. Anahtar yoksa e-postalar gönderilmez, deneme modunda dosyaya yazılır.
+- Harici servis hataları kullanıcıya sade mesajla gösterilir; e-posta hatası uyarının yayınını engellemez (uyarı uygulama içinde yine görünür).
+- Yapay zekâ (Hafta 10): `ANTHROPIC_API_KEY` yalnızca ortam değişkeninde. Kaynak duyuru istemde etiket içinde veri olarak verilir (istem enjeksiyonuna karşı); AI çıktısı doğrulanır ve hiçbir zaman otomatik yayınlanmaz. İsteme kişisel veri konmaz.

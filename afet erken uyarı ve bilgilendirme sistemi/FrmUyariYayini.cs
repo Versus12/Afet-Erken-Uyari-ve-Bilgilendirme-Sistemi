@@ -110,13 +110,63 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
                           " bölgeye " + UyariSeviyeleri.Ad(u.Seviye).ToUpper() + " seviyesinde yayınlanacak. Onaylıyor musunuz?";
             if (u.BolgeIdleri.Count > 0 && !ArayuzYardimci.Onayla(ozet)) return;
 
-            int alici = 0;
-            if (ArayuzYardimci.Calistir(this, () => _uyariManager.Yayinla(u, out alici)))
+            YayinSonucu sonuc = null;
+            if (ArayuzYardimci.Calistir(this, () => sonuc = _uyariManager.Yayinla(u)))
             {
-                ArayuzYardimci.Bilgi("Uyarı yayınlandı. Ulaşacağı abone sayısı: " + alici);
+                ArayuzYardimci.Bilgi("Uyarı yayınlandı. Ulaşacağı abone sayısı: " + sonuc.AliciSayisi +
+                                     "\n\nE-posta bildirimi (" + sonuc.Eposta.SaglayiciAdi + "):\n" + sonuc.Eposta);
                 Temizle();
                 Listele();
             }
+        }
+
+        /// <summary>
+        /// Hafta 10: duyuru metninden yapay zekâ ile bölgeye özel sade uyarı taslağı.
+        /// Seçili bölgeler ve afet türü pencereye aktarılır; onaylanan taslak bu formun alanlarına yazılır.
+        /// Uyarı otomatik yayınlanmaz — yönetici kontrol edip "Uyarıyı Yayınla"ya basar.
+        /// </summary>
+        private void btnYapayZeka_Click(object sender, EventArgs e)
+        {
+            List<int> bolgeIdleri = new List<int>();
+            List<string> bolgeAdlari = new List<string>();
+            foreach (object o in clbBolgeler.CheckedItems)
+            {
+                bolgeIdleri.Add(((Bolge)o).BolgeId);
+                bolgeAdlari.Add(((Bolge)o).BolgeAdi);
+            }
+            if (bolgeIdleri.Count == 0)
+            {
+                ArayuzYardimci.Uyar("Taslak bölgeye özel hazırlanır. Önce soldaki listeden hedef bölgeleri işaretleyiniz.");
+                return;
+            }
+
+            using (FrmSadeUyari frm = new FrmSadeUyari(bolgeIdleri, string.Join(", ", bolgeAdlari), (string)cmbAfetTuru.SelectedItem))
+            {
+                if (frm.ShowDialog(this) != DialogResult.OK || frm.Taslak == null) return;
+                SadeUyariTaslagi t = frm.Taslak;
+                txtBaslik.Text = t.Baslik;
+                txtMesaj.Text = t.Mesaj;
+                cmbAfetTuru.SelectedItem = t.AfetTuru;
+                cmbSeviye.SelectedIndex = t.Seviye - 1;
+                txtBaslik.Focus();
+                ArayuzYardimci.Bilgi("Taslak forma aktarıldı. Metni okuyup gerekirse düzeltin, sonra \"Uyarıyı Yayınla\"ya basın.");
+            }
+        }
+
+        /// <summary>Hafta 10: AI günlüğü (istem, ham çıktı, doğrulama notları).</summary>
+        private void btnAiGunlugu_Click(object sender, EventArgs e)
+        {
+            using (FrmYapayZekaGunlugu frm = new FrmYapayZekaGunlugu())
+                frm.ShowDialog(this);
+        }
+
+        /// <summary>Seçili uyarının e-posta gönderim kayıtlarını açar (Hafta 9).</summary>
+        private void btnBildirimler_Click(object sender, EventArgs e)
+        {
+            UyariSatiri s = ArayuzYardimci.SeciliNesne<UyariSatiri>(dgvUyarilar);
+            if (s == null) { ArayuzYardimci.Uyar("Listeden bir uyarı seçiniz."); return; }
+            using (FrmBildirimKayitlari frm = new FrmBildirimKayitlari(s.UyariId, s.Baslik))
+                frm.ShowDialog(this);
         }
 
         private void Temizle()

@@ -37,6 +37,9 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
             this.dgvUyarilar = new System.Windows.Forms.DataGridView();
             this.pnlAlt = new System.Windows.Forms.Panel();
             this.btnYayindanKaldir = new System.Windows.Forms.Button();
+            this.btnBildirimler = new System.Windows.Forms.Button();
+            this.btnYapayZeka = new System.Windows.Forms.Button();
+            this.btnAiGunlugu = new System.Windows.Forms.Button();
             this.lblListe = new System.Windows.Forms.Label();
             this.pnlSol.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvUyarilar)).BeginInit();
@@ -47,6 +50,7 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
             //
             this.pnlSol.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(247)))), ((int)(((byte)(250)))));
             this.pnlSol.Controls.Add(this.lblBaslikForm);
+            this.pnlSol.Controls.Add(this.btnYapayZeka);
             this.pnlSol.Controls.Add(this.lblBaslik);
             this.pnlSol.Controls.Add(this.txtBaslik);
             this.pnlSol.Controls.Add(this.lblMesaj);
@@ -231,6 +235,8 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
             // pnlAlt
             //
             this.pnlAlt.Controls.Add(this.btnYayindanKaldir);
+            this.pnlAlt.Controls.Add(this.btnBildirimler);
+            this.pnlAlt.Controls.Add(this.btnAiGunlugu);
             this.pnlAlt.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlAlt.Location = new System.Drawing.Point(340, 535);
             this.pnlAlt.Name = "pnlAlt";
@@ -247,6 +253,39 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
             this.btnYayindanKaldir.Text = "Seçili Uyarıyı Yayından Kaldır";
             this.btnYayindanKaldir.UseVisualStyleBackColor = true;
             this.btnYayindanKaldir.Click += new System.EventHandler(this.btnYayindanKaldir_Click);
+            //
+            // btnBildirimler
+            //
+            this.btnBildirimler.Location = new System.Drawing.Point(216, 6);
+            this.btnBildirimler.Name = "btnBildirimler";
+            this.btnBildirimler.Size = new System.Drawing.Size(200, 34);
+            this.btnBildirimler.TabIndex = 1;
+            this.btnBildirimler.Text = "E-posta Gönderim Kayıtları";
+            this.btnBildirimler.UseVisualStyleBackColor = true;
+            this.btnBildirimler.Click += new System.EventHandler(this.btnBildirimler_Click);
+            //
+            // btnYapayZeka
+            //
+            this.btnYapayZeka.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(142)))), ((int)(((byte)(68)))), ((int)(((byte)(173)))));
+            this.btnYapayZeka.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnYapayZeka.ForeColor = System.Drawing.Color.White;
+            this.btnYapayZeka.Location = new System.Drawing.Point(150, 8);
+            this.btnYapayZeka.Name = "btnYapayZeka";
+            this.btnYapayZeka.Size = new System.Drawing.Size(170, 28);
+            this.btnYapayZeka.TabIndex = 20;
+            this.btnYapayZeka.Text = "Yapay Zekâ ile Taslak...";
+            this.btnYapayZeka.UseVisualStyleBackColor = false;
+            this.btnYapayZeka.Click += new System.EventHandler(this.btnYapayZeka_Click);
+            //
+            // btnAiGunlugu
+            //
+            this.btnAiGunlugu.Location = new System.Drawing.Point(424, 6);
+            this.btnAiGunlugu.Name = "btnAiGunlugu";
+            this.btnAiGunlugu.Size = new System.Drawing.Size(180, 34);
+            this.btnAiGunlugu.TabIndex = 2;
+            this.btnAiGunlugu.Text = "Yapay Zekâ Günlüğü";
+            this.btnAiGunlugu.UseVisualStyleBackColor = true;
+            this.btnAiGunlugu.Click += new System.EventHandler(this.btnAiGunlugu_Click);
             //
             // FrmUyariYayini
             //
@@ -296,6 +335,9 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
         private System.Windows.Forms.DataGridView dgvUyarilar;
         private System.Windows.Forms.Panel pnlAlt;
         private System.Windows.Forms.Button btnYayindanKaldir;
+        private System.Windows.Forms.Button btnBildirimler;
+        private System.Windows.Forms.Button btnYapayZeka;
+        private System.Windows.Forms.Button btnAiGunlugu;
         private System.Windows.Forms.Label lblListe;
     }
 }

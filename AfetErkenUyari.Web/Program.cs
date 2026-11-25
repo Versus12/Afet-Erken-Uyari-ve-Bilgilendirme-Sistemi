@@ -65,6 +65,27 @@ builder.Services.AddScoped<UyariManager>();
 builder.Services.AddScoped<RehberManager>();
 builder.Services.AddScoped<ToplanmaAlaniManager>();
 
+// ---------------------------------------------------------------- Hafta 9: harici API'ler
+// E-posta API'si (Brevo) ve harita API'si (OpenStreetMap Nominatim) için HttpClient'lar: 10 sn zaman aşımı.
+builder.Services.AddHttpClient("eposta", c => c.Timeout = TimeSpan.FromSeconds(10));
+builder.Services.AddHttpClient("harita", c =>
+{
+    c.Timeout = TimeSpan.FromSeconds(10);
+    c.DefaultRequestHeaders.UserAgent.ParseAdd("AfetErkenUyari-P14/0.9 (ogrenci projesi)");
+    c.DefaultRequestHeaders.AcceptLanguage.ParseAdd("tr");
+});
+// API anahtarı ortam değişkeninde (AFET_EPOSTA_API_ANAHTARI) varsa gerçek gönderim, yoksa deneme modu.
+builder.Services.AddScoped<IEpostaGonderici>(EpostaGondericiSecici.Olustur);
+builder.Services.AddScoped<BildirimRepository>();
+builder.Services.AddScoped<BildirimManager>();
+builder.Services.AddScoped<HaritaServisi>();
+
+// ---------------------------------------------------------------- Hafta 10: yapay zekâ bileşeni
+// ANTHROPIC_API_KEY ortam değişkeni varsa Claude kullanılır; yoksa kural tabanlı taslak üretilir.
+builder.Services.AddSingleton(sp => new YapayZekaSecimi(ClaudeIstemcisi.Olustur(sp.GetRequiredService<IConfiguration>())));
+builder.Services.AddScoped<YapayZekaRepository>();
+builder.Services.AddScoped<SadeUyariManager>();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

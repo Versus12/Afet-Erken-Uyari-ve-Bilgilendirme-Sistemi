@@ -12,6 +12,7 @@ public class AbonelikController(AbonelikManager abonelikManager, BolgeManager bo
     public IActionResult Index() => View(new AbonelikSayfaModel
     {
         Abonelikler = abonelikManager.Aboneliklerim(Kullanici),
+        Eposta = abonelikManager.BildirimEpostasi(Kullanici),
         Bolgeler = bolgeManager.Listele()
     });
 

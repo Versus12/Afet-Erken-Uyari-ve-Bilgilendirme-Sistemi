@@ -43,11 +43,15 @@ public class BolgeManager(BolgeRepository repo)
 /// - Aynı bölgeye ikinci kez abone olunamaz.
 /// - Kullanıcı yalnızca KENDİ aboneliğini değiştirebilir/silebilir (sahiplik kontrolü).
 /// </summary>
-public class AbonelikManager(AbonelikRepository repo, BolgeRepository bolgeRepo)
+public class AbonelikManager(AbonelikRepository repo, BolgeRepository bolgeRepo, KullaniciRepository kullaniciRepo)
 {
     public const int MaksimumAbonelik = 10;
 
     public List<Abonelik> Aboneliklerim(AktifKullanici kullanici) => repo.KullaniciAbonelikleri(kullanici.Id);
+
+    /// <summary>E-posta bildirimlerinin gideceği adres: hesabın kayıtlı e-postası (ayrı bir mail adresi yok).</summary>
+    public string BildirimEpostasi(AktifKullanici kullanici) =>
+        kullaniciRepo.KullaniciAdiIleGetir(kullanici.KullaniciAdi)?.Eposta ?? "";
 
     public string AboneOl(AktifKullanici kullanici, int bolgeId, string? kanal, int minSeviye)
     {

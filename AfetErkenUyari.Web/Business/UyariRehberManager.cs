@@ -9,12 +9,16 @@ namespace AfetErkenUyari.Web.Business;
 /// - Uyarı en az bir bölgeye hedeflenmelidir.
 /// - Bitiş tarihi yayın tarihinden sonra olmalı; en fazla 30 gün geçerli olabilir.
 /// </summary>
-public class UyariManager(UyariRepository repo, AbonelikRepository abonelikRepo, BolgeRepository bolgeRepo)
+public class UyariManager(UyariRepository repo, AbonelikRepository abonelikRepo, BolgeRepository bolgeRepo,
+                          BildirimManager bildirimManager)
 {
     public const int MaksimumGecerlilikGun = 30;
 
-    /// <summary>Uyarıyı yayınlar; ulaşacağı abone sayısını döndürür.</summary>
-    public int Yayinla(AktifKullanici kullanici, Uyari u)
+    /// <summary>
+    /// Uyarıyı yayınlar, ulaşacağı abone sayısını hesaplar ve E-posta kanalını seçen abonelere
+    /// e-posta gönderir (Hafta 9). E-posta hatası yayını geri almaz; sonuç özette raporlanır.
+    /// </summary>
+    public YayinSonucu Yayinla(AktifKullanici kullanici, Uyari u)
     {
         kullanici.YoneticiOlmali();
 
@@ -39,8 +43,14 @@ public class UyariManager(UyariRepository repo, AbonelikRepository abonelikRepo,
 
         u.YayinlayanId = kullanici.Id;
         u.AktifMi = true;
-        u.UyariId = repo.Ekle(u);
-        return abonelikRepo.UyariAliciSayisi(u.UyariId);
+        u.UyariId = repo.Ekle(u);   // uyarı + hedef bölgeler + e-posta kuyruğu (tek transaction)
+
+        return new YayinSonucu
+        {
+            UyariId = u.UyariId,
+            AliciSayisi = abonelikRepo.UyariAliciSayisi(u.UyariId),
+            Eposta = bildirimManager.UyariIcinGonder(kullanici, u.UyariId)
+        };
     }
 
     public List<Uyari> TumUyarilar(AktifKullanici kullanici)
@@ -89,7 +99,7 @@ public class RehberManager(RehberRepository repo)
     }
 }
 
-/// <summary>Toplanma alanı (temel liste/CRUD; harita ve en yakın alan Hafta 11'de).</summary>
+/// <summary>Toplanma alanı (temel liste/CRUD). Adresten konum bulma: HaritaServisi (Hafta 9); harita modülü ve en yakın alan Hafta 11.</summary>
 public class ToplanmaAlaniManager(ToplanmaAlaniRepository repo, AbonelikRepository abonelikRepo)
 {
     /// <summary>sadeceAboneliklerim: abonelik modülündeki bölgelerle filtreler (modül entegrasyonu).</summary>

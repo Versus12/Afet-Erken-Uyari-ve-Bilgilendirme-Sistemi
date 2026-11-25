@@ -42,7 +42,7 @@
             <table class="table align-middle mb-0">
                 <thead>
                     <tr>
-                        <th>Bölge</th><th>Alan adı</th><th>Adres</th><th class="text-end">Kapasite</th>
+                        <th>Bölge</th><th>Alan adı</th><th>Adres</th><th class="text-end">Kapasite</th><th>Harita</th>
                         @if (yonetici) { <th></th> }
                     </tr>
                 </thead>
@@ -54,6 +54,14 @@
                             <td><strong>@t.AlanAdi</strong></td>
                             <td>@t.Adres</td>
                             <td class="text-end">@t.Kapasite.ToString("N0")</td>
+                            <td>
+                                @if (t.Enlem.HasValue && t.Boylam.HasValue)
+                                {
+                                    <a target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary text-nowrap"
+                                       href="@AfetErkenUyari.Web.Business.HaritaServisi.HaritaBaglantisi(t.Enlem.Value, t.Boylam.Value)">Haritada aç</a>
+                                }
+                                else { <span class="small text-muted">konum yok</span> }
+                            </td>
                             @if (yonetici)
                             {
                                 <td class="text-nowrap text-end">

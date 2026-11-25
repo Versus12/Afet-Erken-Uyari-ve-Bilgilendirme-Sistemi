@@ -55,6 +55,9 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi.Data
                         }
                     }
 
+                    // Hafta 9: e-posta kuyruğu da aynı transaction'da oluşturulur.
+                    BildirimRepository.KuyrugaEkle(con, tr, yeniId);
+
                     tr.Commit();
                     return yeniId;
                 }

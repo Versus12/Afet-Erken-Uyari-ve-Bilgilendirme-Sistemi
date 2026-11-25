@@ -13,10 +13,51 @@ public static class AfetTurleri
     public static readonly string[] Tumu = { "Deprem", "Sel", "Yangın", "Fırtına", "Heyelan", "Çığ", "Kar", "Diğer" };
 }
 
-/// <summary>Bildirim kanalları. CK_Abonelikler_Kanal ile aynıdır.</summary>
+/// <summary>
+/// Bildirim kanalları. CK_Abonelikler_Kanal ile aynıdır.
+/// Hafta 9: SMS kaldırıldı. Tek dış kanal E-posta'dır ve kullanıcının kayıtlı
+/// e-posta adresine gönderilir (ayrı bir "mail" adresi tutulmaz).
+/// </summary>
 public static class BildirimKanallari
 {
-    public static readonly string[] Tumu = { "Uygulama", "SMS", "Eposta" };
+    public const string Uygulama = "Uygulama";
+    public const string Eposta = "Eposta";
+
+    public static readonly string[] Tumu = { Uygulama, Eposta };
+
+    /// <summary>Ekranda gösterilen ad.</summary>
+    public static string Ad(string? kanal) => kanal switch
+    {
+        Eposta => "E-posta",
+        Uygulama => "Uygulama içi",
+        _ => kanal ?? ""
+    };
+}
+
+/// <summary>Bildirim gönderim durumları. CK_Bildirimler_Durum ile aynıdır.</summary>
+public static class BildirimDurumlari
+{
+    public const string Bekliyor = "Bekliyor";
+    public const string Gonderildi = "Gonderildi";
+    public const string DenemeModu = "DenemeModu";
+    public const string Basarisiz = "Basarisiz";
+
+    public static string Ad(string durum) => durum switch
+    {
+        Gonderildi => "Gönderildi",
+        DenemeModu => "Deneme modu (dosyaya yazıldı)",
+        Basarisiz => "Başarısız",
+        _ => "Bekliyor"
+    };
+
+    /// <summary>Bootstrap renk sınıfı.</summary>
+    public static string Renk(string durum) => durum switch
+    {
+        Gonderildi => "success",
+        DenemeModu => "info",
+        Basarisiz => "danger",
+        _ => "warning"
+    };
 }
 
 /// <summary>Rehber aşamaları.</summary>

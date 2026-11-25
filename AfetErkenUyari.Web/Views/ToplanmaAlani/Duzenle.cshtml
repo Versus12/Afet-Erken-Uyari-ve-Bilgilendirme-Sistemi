@@ -39,6 +39,21 @@
                        value="@Model.Alan.Boylam?.ToString(System.Globalization.CultureInfo.InvariantCulture)" placeholder="40.4982" />
             </div>
         </div>
+        <div class="mt-2">
+            @* Hafta 9 - Harita API: formu KonumBul eylemine gönderir; bulunan koordinat alanlara yazılır. *@
+            <button type="submit" class="btn btn-sm btn-outline-primary" asp-controller="ToplanmaAlani" asp-action="KonumBul" formnovalidate>
+                Adresten konum bul (Harita API)
+            </button>
+            @if (Model.Alan.Enlem.HasValue && Model.Alan.Boylam.HasValue)
+            {
+                <a class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener"
+                   href="@AfetErkenUyari.Web.Business.HaritaServisi.HaritaBaglantisi(Model.Alan.Enlem.Value, Model.Alan.Boylam.Value)">Haritada gör</a>
+            }
+            @if (!string.IsNullOrEmpty(Model.BulunanAdres))
+            {
+                <div class="small text-success mt-1">Bulunan konum: @Model.BulunanAdres — kaydetmek için "Kaydet"e basınız.</div>
+            }
+        </div>
         <div class="mt-3 d-flex gap-2">
             <button type="submit" class="btn btn-ana">Kaydet</button>
             <a class="btn btn-outline-secondary" asp-controller="ToplanmaAlani" asp-action="Index">Vazgeç</a>

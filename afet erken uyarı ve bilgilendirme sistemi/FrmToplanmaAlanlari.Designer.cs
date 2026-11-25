@@ -39,6 +39,8 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
             this.btnYeni = new System.Windows.Forms.Button();
             this.btnKaydet = new System.Windows.Forms.Button();
             this.btnSil = new System.Windows.Forms.Button();
+            this.btnKonumBul = new System.Windows.Forms.Button();
+            this.btnHaritadaAc = new System.Windows.Forms.Button();
             this.pnlUst.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvAlanlar)).BeginInit();
             this.grpDuzenle.SuspendLayout();
@@ -50,6 +52,7 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
             this.pnlUst.Controls.Add(this.lblFiltre);
             this.pnlUst.Controls.Add(this.cmbFiltre);
             this.pnlUst.Controls.Add(this.chkAboneliklerim);
+            this.pnlUst.Controls.Add(this.btnHaritadaAc);
             this.pnlUst.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlUst.Location = new System.Drawing.Point(0, 0);
             this.pnlUst.Name = "pnlUst";
@@ -118,6 +121,7 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
             this.grpDuzenle.Controls.Add(this.btnYeni);
             this.grpDuzenle.Controls.Add(this.btnKaydet);
             this.grpDuzenle.Controls.Add(this.btnSil);
+            this.grpDuzenle.Controls.Add(this.btnKonumBul);
             this.grpDuzenle.Dock = System.Windows.Forms.DockStyle.Right;
             this.grpDuzenle.Location = new System.Drawing.Point(624, 44);
             this.grpDuzenle.Name = "grpDuzenle";
@@ -253,6 +257,27 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
             this.btnSil.UseVisualStyleBackColor = true;
             this.btnSil.Click += new System.EventHandler(this.btnSil_Click);
             //
+            // btnKonumBul
+            //
+            this.btnKonumBul.Location = new System.Drawing.Point(14, 344);
+            this.btnKonumBul.Name = "btnKonumBul";
+            this.btnKonumBul.Size = new System.Drawing.Size(270, 32);
+            this.btnKonumBul.TabIndex = 9;
+            this.btnKonumBul.Text = "Adresten Konum Bul (Harita API)";
+            this.btnKonumBul.UseVisualStyleBackColor = true;
+            this.btnKonumBul.Click += new System.EventHandler(this.btnKonumBul_Click);
+            //
+            // btnHaritadaAc
+            //
+            this.btnHaritadaAc.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnHaritadaAc.Location = new System.Drawing.Point(744, 8);
+            this.btnHaritadaAc.Name = "btnHaritadaAc";
+            this.btnHaritadaAc.Size = new System.Drawing.Size(170, 28);
+            this.btnHaritadaAc.TabIndex = 3;
+            this.btnHaritadaAc.Text = "Seçili Alanı Haritada Aç";
+            this.btnHaritadaAc.UseVisualStyleBackColor = true;
+            this.btnHaritadaAc.Click += new System.EventHandler(this.btnHaritadaAc_Click);
+            //
             // FrmToplanmaAlanlari
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -304,5 +329,7 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
         private System.Windows.Forms.Button btnYeni;
         private System.Windows.Forms.Button btnKaydet;
         private System.Windows.Forms.Button btnSil;
+        private System.Windows.Forms.Button btnKonumBul;
+        private System.Windows.Forms.Button btnHaritadaAc;
     }
 }

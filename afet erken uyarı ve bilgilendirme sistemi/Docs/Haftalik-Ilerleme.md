@@ -61,13 +61,36 @@ Teknoloji: C#, .NET Framework 4.7.2, Windows Forms, Microsoft SQL Server, ADO.NE
 - [x] AI kullanım günlüğü → [AI-Kullanim-Gunlugu.md](AI-Kullanim-Gunlugu.md)
 - [ ] **Git etiketi:** `git tag -a v0.8.0 -m "Vize ara sürüm"` ve `git push origin v0.8.0` (commit sonrası öğrenci tarafından)
 
+## Hafta 9 · Harici API Entegrasyonu: Harita / Bildirim ✅
+**Teslim:** Çalışan API entegrasyonu · Hata yönetimi
+
+- [x] **Bildirim kanalı sadeleştirildi:** SMS kaldırıldı; kanallar yalnızca *Uygulama içi* ve *E-posta*. E-posta, kullanıcının kayıtlı adresine gider (ayrı bir "mail" adresi yok). Eski SMS abonelikleri `01_Sema.sql` ile E-posta'ya çevrildi; `CK_Abonelikler_Kanal` güncellendi.
+- [x] **Bildirim API'si (e-posta):** Brevo REST API (`POST /v3/smtp/email`, `api-key` başlığı) → `BrevoEpostaGonderici`. Anahtar yoksa **deneme modu**: e-posta `.eml` dosyası olarak `%LOCALAPPDATA%\AfetErkenUyari\GidenEpostalar` klasörüne yazılır.
+- [x] **Toplu bildirim:** Uyarı yayınlanınca e-posta kuyruğu (`Bildirimler` tablosu) uyarıyla **aynı transaction** içinde oluşturulur; her kişiye bir uyarı için tek e-posta (`UQ_Bildirimler`). `BildirimManager` kuyruğu sırayla gönderir.
+- [x] **Hata yönetimi:** 10 sn zaman aşımı; geçici hatada (zaman aşımı, 429, 5xx) en fazla 3 deneme ve artan bekleme; kalıcı hatada (400) hemen "Başarısız"; yanlış anahtarda (401/403) kalan gönderimler durur. E-posta hatası uyarı yayınını geri almaz. Yönetici "E-posta Gönderim Kayıtları" ekranından başarısızları yeniden dener.
+- [x] **Hız sınırı (rate limit):** e-postalar arasında en az 250 ms; harita servisine saniyede en fazla 1 istek; 429 yanıtındaki `Retry-After` dikkate alınır.
+- [x] **Harita API'si:** OpenStreetMap Nominatim ile **adresten konum bulma** (toplanma alanı formunda "Adresten Konum Bul"); yanıt (JSON) ayrıştırılıp enlem/boylam alanlarına yazılır. "Haritada aç" seçili alanı OpenStreetMap'te gösterir.
+- [x] **Anahtar ortam değişkeninde:** `AFET_EPOSTA_API_ANAHTARI`, `AFET_EPOSTA_GONDEREN` (isteğe bağlı `AFET_HARITA_URL`). Depoda anahtar yok.
+- [x] Test: masaüstü iş katmanı 24/24, web 16/16 senaryo (gerçek Nominatim ve Brevo çağrıları dahil).
+
+## Hafta 10 · Yapay Zekâ Bileşeni: Duyuru Özetleme ve Sade Uyarı ✅
+**Teslim:** Çalışan yapay zekâ bileşeni · AI kullanım günlüğü
+
+- [x] **Metin özetleme + sade dil:** Yönetici kurumun (AFAD, MGM, valilik) teknik duyurusunu yapıştırır; sistem seçili bölgeler için kısa, sade, bölgeye özel bir uyarı taslağı üretir (başlık, mesaj, önerilen seviye ve afet türü).
+- [x] **Model/LLM API:** Anthropic'in resmî C# SDK'sı (`Anthropic` 13.8.0) ile Claude (`claude-opus-5-5`). Yapılandırılmış çıktı (JSON şeması) kullanılır; güvenlik reddinde sunucu tarafı yedek model (`fallbacks: default`) devreye girer. Anahtar ortam değişkeninde: `ANTHROPIC_API_KEY`.
+- [x] **İstem tasarımı:** Sabit sistem istemi (9 kural: yalnızca kaynaktaki bilgi, sayı/adres uydurmama, bölge adını geçirme, en fazla 4 kısa cümle, son cümle eylem, seviye ölçütleri). Kaynak metin `<kaynak_duyuru>` etiketleri içinde **veri** olarak verilir (istem enjeksiyonuna karşı).
+- [x] **Çıktı doğrulama (`CiktiDogrulayici`):** boş/bozuk JSON, `uygun=false`, uzunluklar, seviye 1-4, afet türü listede, **kaynakta olmayan sayı** (uydurma bilgi), kaynakta olmayan internet adresi, hedef bölgenin anılmaması → HATA; 25 kelimeyi aşan cümle, 4'ten fazla cümle → UYARI.
+- [x] **Hatalı/boş çıktı yönetimi:** AI hata verirse, anahtar yoksa ya da çıktı doğrulanamazsa **kural tabanlı özetleyici** devreye girer (anahtar kelimeyle seviye/tür, kaynaktan kısa cümleler, sabit eylem cümlesi); neden kural tabanlı taslak gösterildiği ekranda yazar.
+- [x] **İnsan onayı:** Taslak asla otomatik yayınlanmaz; geçerliyse yayın formuna aktarılır, yönetici okuyup düzeltip yayınlar.
+- [x] **AI günlüğü:** Her denemenin istemi, ham çıktısı, doğrulama notları, süresi `YapayZekaKayitlari` tablosunda; "Yapay Zekâ Günlüğü" ekranından okunur.
+- [x] Proje paket yapısı `packages.config` → `PackageReference`'a taşındı (SDK bağımlılıkları için); C# dil sürümü `latest`.
+- [x] Test: masaüstü 23/23 + 9 form, web 12/12 (anahtarsız) ve 12/12 (geçersiz anahtarla gerçek Claude çağrısı → 401 → kural tabanlı yedek).
+
 ---
 
-## Sonraki aşama planı (Hafta 9+)
+## Sonraki aşama planı (Hafta 11+)
 | Hafta | Plan |
 |---|---|
-| 9 | Harita (toplanma alanları) ve SMS/e-posta bildirim API'si; anahtar ortam değişkeninde |
-| 10 | Yapay zekâ: gelen duyuruyu bölgeye özel sade uyarı metnine özetleme + çıktı doğrulama |
 | 11 | En yakın toplanma alanı hesabı (Haversine) ve harita gösterimi |
 | 12 | Yönetim panosu: abonelik/uyarı istatistikleri, grafik, CSV dışa aktarma |
 | 13 | Birim + entegrasyon testleri (MSTest), hata listesi |

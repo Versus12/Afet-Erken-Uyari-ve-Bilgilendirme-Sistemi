@@ -97,7 +97,7 @@ BEGIN
         CONSTRAINT FK_Abonelikler_Bolgeler FOREIGN KEY (BolgeId)
             REFERENCES dbo.Bolgeler (BolgeId),
         CONSTRAINT UQ_Abonelikler_KullaniciBolge UNIQUE (KullaniciId, BolgeId),
-        CONSTRAINT CK_Abonelikler_Kanal CHECK (BildirimKanali IN (N'Uygulama', N'SMS', N'Eposta')),
+        CONSTRAINT CK_Abonelikler_Kanal CHECK (BildirimKanali IN (N'Uygulama', N'Eposta')),
         CONSTRAINT CK_Abonelikler_MinSeviye CHECK (MinSeviye BETWEEN 1 AND 4)
     );
     CREATE INDEX IX_Abonelikler_BolgeId ON dbo.Abonelikler (BolgeId);
@@ -193,6 +193,90 @@ BEGIN
         CONSTRAINT CK_ToplanmaAlanlari_Kapasite CHECK (Kapasite > 0)
     );
     CREATE INDEX IX_ToplanmaAlanlari_BolgeId ON dbo.ToplanmaAlanlari (BolgeId);
+END
+GO
+
+/* ---------------------------------------------------------------------
+   8) Hafta 9 güncellemesi - bildirim kanalları
+   SMS kanalı kaldırıldı; dış bildirim kanalı yalnızca E-posta.
+   E-posta, kullanıcının kayıtlı adresine (Kullanicilar.Eposta) gönderilir;
+   ayrı bir "mail" adresi tutulmaz.
+   Eski veritabanlarında SMS seçilmiş abonelikler E-posta'ya çevrilir.
+   --------------------------------------------------------------------- */
+IF EXISTS (SELECT 1 FROM sys.check_constraints
+           WHERE name = N'CK_Abonelikler_Kanal' AND definition LIKE N'%SMS%')
+BEGIN
+    ALTER TABLE dbo.Abonelikler DROP CONSTRAINT CK_Abonelikler_Kanal;
+    UPDATE dbo.Abonelikler SET BildirimKanali = N'Eposta' WHERE BildirimKanali = N'SMS';
+    ALTER TABLE dbo.Abonelikler ADD CONSTRAINT CK_Abonelikler_Kanal
+        CHECK (BildirimKanali IN (N'Uygulama', N'Eposta'));
+END
+GO
+
+/* ---------------------------------------------------------------------
+   9) Bildirimler  (Hafta 9 - e-posta bildirim kuyruğu ve gönderim kaydı)
+   Her (uyarı, kullanıcı, kanal) için tek kayıt: aynı kişiye aynı uyarı
+   iki kez gönderilmez (UQ_Bildirimler). Başarısız gönderimler kayıtlı
+   kalır ve yönetici tarafından yeniden denenebilir.
+   Durum: Bekliyor / Gonderildi / DenemeModu / Basarisiz
+   --------------------------------------------------------------------- */
+IF OBJECT_ID(N'dbo.Bildirimler', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.Bildirimler
+    (
+        BildirimId     INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Bildirimler PRIMARY KEY,
+        UyariId        INT           NOT NULL,
+        KullaniciId    INT           NOT NULL,
+        Kanal          NVARCHAR(20)  NOT NULL CONSTRAINT DF_Bildirimler_Kanal DEFAULT (N'Eposta'),
+        Alici          NVARCHAR(150) NOT NULL,
+        Durum          NVARCHAR(20)  NOT NULL CONSTRAINT DF_Bildirimler_Durum DEFAULT (N'Bekliyor'),
+        DenemeSayisi   TINYINT       NOT NULL CONSTRAINT DF_Bildirimler_Deneme DEFAULT (0),
+        SonHata        NVARCHAR(500) NULL,
+        SaglayiciMesajId NVARCHAR(200) NULL,
+        OlusturmaTarihi DATETIME     NOT NULL CONSTRAINT DF_Bildirimler_Tarih DEFAULT (GETDATE()),
+        GonderimTarihi DATETIME      NULL,
+        CONSTRAINT FK_Bildirimler_Uyarilar FOREIGN KEY (UyariId)
+            REFERENCES dbo.Uyarilar (UyariId) ON DELETE CASCADE,
+        CONSTRAINT FK_Bildirimler_Kullanicilar FOREIGN KEY (KullaniciId)
+            REFERENCES dbo.Kullanicilar (Id),
+        CONSTRAINT UQ_Bildirimler UNIQUE (UyariId, KullaniciId, Kanal),
+        CONSTRAINT CK_Bildirimler_Kanal CHECK (Kanal IN (N'Eposta')),
+        CONSTRAINT CK_Bildirimler_Durum CHECK (Durum IN (N'Bekliyor', N'Gonderildi', N'DenemeModu', N'Basarisiz'))
+    );
+    CREATE INDEX IX_Bildirimler_Durum ON dbo.Bildirimler (Durum, UyariId);
+END
+GO
+
+/* ---------------------------------------------------------------------
+   10) YapayZekaKayitlari  (Hafta 10 - AI günlüğü)
+   Duyurudan sade uyarı metni üretmek için yapılan her denemenin istemi
+   (prompt), ham çıktısı ve doğrulama sonucu saklanır. Böylece AI çıktısı
+   körlemesine kullanılmaz; ne sorulduğu ve ne döndüğü belgelenir.
+   Saglayici: "Claude (model)" veya "Kural tabanlı" (AI kullanılamadığında).
+   --------------------------------------------------------------------- */
+IF OBJECT_ID(N'dbo.YapayZekaKayitlari', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.YapayZekaKayitlari
+    (
+        KayitId          INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_YapayZekaKayitlari PRIMARY KEY,
+        KullaniciId      INT            NOT NULL,
+        Tarih            DATETIME       NOT NULL CONSTRAINT DF_YapayZekaKayitlari_Tarih DEFAULT (GETDATE()),
+        Saglayici        NVARCHAR(100)  NOT NULL,
+        HedefBolgeler    NVARCHAR(500)  NOT NULL,
+        KaynakMetin      NVARCHAR(4000) NOT NULL,
+        Istem            NVARCHAR(MAX)  NOT NULL,
+        HamCikti         NVARCHAR(MAX)  NULL,
+        Baslik           NVARCHAR(150)  NULL,
+        Mesaj            NVARCHAR(2000) NULL,
+        OnerilenSeviye   TINYINT        NULL,
+        Gecerli          BIT            NOT NULL CONSTRAINT DF_YapayZekaKayitlari_Gecerli DEFAULT (0),
+        DogrulamaNotlari NVARCHAR(2000) NULL,
+        SureMs           INT            NULL,
+        CONSTRAINT FK_YapayZekaKayitlari_Kullanicilar FOREIGN KEY (KullaniciId)
+            REFERENCES dbo.Kullanicilar (Id),
+        CONSTRAINT CK_YapayZekaKayitlari_Seviye CHECK (OnerilenSeviye IS NULL OR OnerilenSeviye BETWEEN 1 AND 4)
+    );
+    CREATE INDEX IX_YapayZekaKayitlari_Tarih ON dbo.YapayZekaKayitlari (Tarih DESC);
 END
 GO
 

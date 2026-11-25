@@ -19,8 +19,11 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi.Business
         private readonly UyariRepository _repo = new UyariRepository();
         private readonly AbonelikRepository _abonelikRepo = new AbonelikRepository();
 
-        /// <summary>Uyarıyı yayınlar ve ulaşacağı abone sayısını döndürür.</summary>
-        public int Yayinla(Uyari u, out int aliciSayisi)
+        /// <summary>
+        /// Uyarıyı yayınlar, ulaşacağı abone sayısını hesaplar ve E-posta kanalını seçen abonelere
+        /// e-posta gönderir (Hafta 9). E-posta hatası yayını geri almaz; sonuç özette raporlanır.
+        /// </summary>
+        public YayinSonucu Yayinla(Uyari u)
         {
             Kullanici yonetici = Oturum.YoneticiGerekli();
 
@@ -50,10 +53,15 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi.Business
 
             u.YayinlayanId = yonetici.Id;
             u.AktifMi = true;
-            u.UyariId = _repo.Ekle(u);
+            u.UyariId = _repo.Ekle(u);   // uyarı + hedef bölgeler + e-posta kuyruğu (tek transaction)
 
-            aliciSayisi = _abonelikRepo.UyariAliciSayisi(u.UyariId);
-            return u.UyariId;
+            YayinSonucu sonuc = new YayinSonucu
+            {
+                UyariId = u.UyariId,
+                AliciSayisi = _abonelikRepo.UyariAliciSayisi(u.UyariId)
+            };
+            sonuc.Eposta = new BildirimManager().UyariIcinGonder(u.UyariId);
+            return sonuc;
         }
 
         public List<Uyari> TumUyarilar()

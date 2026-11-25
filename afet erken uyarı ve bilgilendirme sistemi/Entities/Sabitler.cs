@@ -16,10 +16,43 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi.Entities
         };
     }
 
-    /// <summary>Bildirim kanalları. CK_Abonelikler_Kanal ile aynıdır.</summary>
+    /// <summary>
+    /// Bildirim kanalları. CK_Abonelikler_Kanal ile aynıdır.
+    /// Hafta 9: SMS kaldırıldı. Tek dış kanal E-posta'dır ve kullanıcının kayıtlı
+    /// e-posta adresine gönderilir (ayrı bir "mail" adresi tutulmaz).
+    /// </summary>
     public static class BildirimKanallari
     {
-        public static readonly string[] Tumu = { "Uygulama", "SMS", "Eposta" };
+        public const string Uygulama = "Uygulama";
+        public const string Eposta = "Eposta";
+
+        public static readonly string[] Tumu = { Uygulama, Eposta };
+
+        /// <summary>Ekranda gösterilen ad.</summary>
+        public static string Ad(string kanal)
+        {
+            return kanal == Eposta ? "E-posta" : kanal == Uygulama ? "Uygulama içi" : kanal;
+        }
+    }
+
+    /// <summary>Bildirim gönderim durumları. CK_Bildirimler_Durum ile aynıdır.</summary>
+    public static class BildirimDurumlari
+    {
+        public const string Bekliyor = "Bekliyor";
+        public const string Gonderildi = "Gonderildi";
+        public const string DenemeModu = "DenemeModu";
+        public const string Basarisiz = "Basarisiz";
+
+        public static string Ad(string durum)
+        {
+            switch (durum)
+            {
+                case Gonderildi: return "Gönderildi";
+                case DenemeModu: return "Deneme modu (dosyaya yazıldı)";
+                case Basarisiz: return "Başarısız";
+                default: return "Bekliyor";
+            }
+        }
     }
 
     /// <summary>Rehber aşamaları (afetten önce / sırasında / sonra).</summary>

@@ -5,7 +5,7 @@ using afet_erken_uyarı_ve_bilgilendirme_sistemi.Entities;
 namespace afet_erken_uyarı_ve_bilgilendirme_sistemi.Business
 {
     /// <summary>
-    /// Toplanma alanı iş kuralları. (Temel liste/CRUD; harita ve en yakın alan hesabı Hafta 11'de eklenecek.)
+    /// Toplanma alanı iş kuralları. (Temel liste/CRUD; adresten konum bulma Hafta 9 HaritaServisi; harita modülü ve en yakın alan Hafta 11.)
     /// </summary>
     public class ToplanmaAlaniManager
     {

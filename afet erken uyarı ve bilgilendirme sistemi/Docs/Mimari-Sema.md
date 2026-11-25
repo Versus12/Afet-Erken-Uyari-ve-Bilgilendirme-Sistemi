@@ -49,7 +49,7 @@ flowchart TD
 - **Güvenlik:** Yetki kontrolü arayüzde *ve* iş katmanında yapılır. Buton gizlense bile başka bir yoldan çağrılan
   `UyariManager.Yayinla()` vatandaş oturumunda `YetkisizErisimHatasi` fırlatır.
 - **Test edilebilirlik:** İş katmanı form olmadan çağrılabilir (vize öncesi uçtan uca testler bu şekilde yapıldı).
-- **Değiştirilebilirlik:** Hafta 9'da harita/bildirim API'si eklendiğinde yalnızca yeni bir servis sınıfı eklenecek.
+- **Değiştirilebilirlik:** Hafta 9'da harita/bildirim API'si eklenirken formlara dokunmadan iş katmanına yeni servisler eklendi (`IEpostaGonderici` → `BrevoEpostaGonderici` / `DenemeModuEpostaGonderici`, `BildirimManager`, `HaritaServisi`). E-posta sağlayıcısı değişirse yalnızca yeni bir `IEpostaGonderici` sınıfı yazılır.
 
 ## Örnek akış: "Yönetici uyarı yayınlar → vatandaş görür"
 1. `FrmUyariYayini` formu `Uyari` nesnesini doldurur, `UyariManager.Yayinla()` çağırır.

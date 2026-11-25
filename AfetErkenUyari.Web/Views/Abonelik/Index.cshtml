@@ -26,7 +26,7 @@
                     <select id="kanal" name="kanal" class="form-select">
                         @foreach (var k in BildirimKanallari.Tumu)
                         {
-                            <option value="@k">@k</option>
+                            <option value="@k">@BildirimKanallari.Ad(k)</option>
                         }
                     </select>
                 </div>
@@ -43,7 +43,8 @@
             </form>
             <p class="small text-muted mt-3 mb-0">
                 @Model.Abonelikler.Count / @AbonelikManagerSiniri bölgeye abonesiniz.
-                SMS ve e-posta gönderimi Hafta 9'da eklenecek; şimdilik tercih olarak kaydedilir.
+                <strong>E-posta</strong> seçerseniz uyarılar hesabınızdaki adrese gönderilir:
+                <strong>@Model.Eposta</strong>
             </p>
         </div>
     </div>
@@ -75,7 +76,7 @@
                                         <select name="kanal" form="@formId" class="form-select form-select-sm" aria-label="Bildirim kanalı">
                                             @foreach (var k in BildirimKanallari.Tumu)
                                             {
-                                                <option value="@k" selected="@(k == a.BildirimKanali)">@k</option>
+                                                <option value="@k" selected="@(k == a.BildirimKanali)">@BildirimKanallari.Ad(k)</option>
                                             }
                                         </select>
                                     </td>

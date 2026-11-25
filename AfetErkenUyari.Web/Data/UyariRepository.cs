@@ -48,6 +48,9 @@ public class UyariRepository(VeritabaniBaglanti db)
                 cmd.ExecuteNonQuery();
             }
 
+            // Hafta 9: e-posta kuyruğu da aynı transaction'da oluşturulur.
+            BildirimRepository.KuyrugaEkle(con, tr, yeniId);
+
             tr.Commit();
             return yeniId;
         }

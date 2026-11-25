@@ -1,0 +1,63 @@
+@model BildirimKayitModel
+@{
+    ViewData["Title"] = "E-posta Gönderim Kayıtları";
+    var k = Model.Kayitlar;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h1 class="h4 mb-1">E-posta Gönderim Kayıtları</h1>
+        <div class="text-muted">
+            <span class="badge bg-@UyariSeviyeleri.Renk(Model.Uyari.Seviye)">@Model.Uyari.SeviyeAdi</span>
+            <strong>@Model.Uyari.Baslik</strong> · @Model.Uyari.HedefBolgeler
+        </div>
+    </div>
+    <div class="d-flex gap-2">
+        <form asp-controller="Uyari" asp-action="YenidenDene" asp-route-id="@Model.Uyari.UyariId" method="post">
+            <button type="submit" class="btn btn-outline-primary">Başarısızları yeniden dene</button>
+        </form>
+        <a class="btn btn-outline-secondary" asp-controller="Uyari" asp-action="Index">Uyarı listesine dön</a>
+    </div>
+</div>
+
+<div class="kart">
+    <p class="small text-muted">
+        Gönderim yöntemi: <strong>@Model.SaglayiciAdi</strong>.
+        Yalnızca bildirim kanalı <strong>E-posta</strong> olan, aboneliği aktif ve seviye tercihi uyan aboneler listelenir;
+        her kişiye bir uyarı için tek e-posta gider.
+    </p>
+    @if (k.Count == 0)
+    {
+        <p class="text-muted mb-0">Bu uyarı için e-posta kaydı yok (E-posta kanalını seçen abone yok).</p>
+    }
+    else
+    {
+        <p class="small mb-2">
+            @k.Count kayıt ·
+            gönderildi: @k.Count(b => b.Durum == BildirimDurumlari.Gonderildi) ·
+            deneme modu: @k.Count(b => b.Durum == BildirimDurumlari.DenemeModu) ·
+            başarısız: @k.Count(b => b.Durum == BildirimDurumlari.Basarisiz) ·
+            bekliyor: @k.Count(b => b.Durum == BildirimDurumlari.Bekliyor)
+        </p>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr><th>Kullanıcı</th><th>E-posta</th><th>Durum</th><th>Deneme</th><th>Gönderim</th><th>Hata / mesaj no</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in k)
+                    {
+                        <tr>
+                            <td>@b.KullaniciAdi</td>
+                            <td class="small">@b.Alici</td>
+                            <td><span class="badge bg-@BildirimDurumlari.Renk(b.Durum)">@BildirimDurumlari.Ad(b.Durum)</span></td>
+                            <td>@b.DenemeSayisi</td>
+                            <td class="small text-nowrap">@(b.GonderimTarihi?.ToString("dd.MM.yyyy HH:mm") ?? "—")</td>
+                            <td class="small text-break">@(b.SonHata ?? b.SaglayiciMesajId)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -1,6 +1,6 @@
-# Web Sitesi — Haftalık İlerleme (Hafta 3 – 8)
+# Web Sitesi — Haftalık İlerleme (Hafta 3 – 10)
 
-Kaynak: *P14 — Afet Erken Uyarı ve Bilgilendirme Sistemi* ders paketi. Hafta 9 ve sonrası bu sürümün kapsamı dışındadır.
+Kaynak: *P14 — Afet Erken Uyarı ve Bilgilendirme Sistemi* ders paketi. Hafta 11 ve sonrası bu sürümün kapsamı dışındadır.
 
 ## Hafta 3 · Kurulum, Mimari ve Veri Modeli ✅
 - [x] Visual Studio 2022 + .NET 9 SDK, ASP.NET Core MVC proje iskeleti (`AfetErkenUyari.Web`), çözüme eklendi
@@ -43,6 +43,23 @@ Kaynak: *P14 — Afet Erken Uyarı ve Bilgilendirme Sistemi* ders paketi. Hafta 
 - [x] Tarayıcıda uçtan uca deneme (bkz. aşağıdaki test listesi)
 - [x] Demo senaryosu → [Web-Demo-Senaryosu.md](Web-Demo-Senaryosu.md)
 - [ ] Git etiketi: commit sonrası `v0.8.0-web`
+
+## Hafta 9 · Harici API Entegrasyonu: Harita / Bildirim ✅
+- [x] SMS kanalı kaldırıldı; kanallar *Uygulama içi* ve *E-posta*. E-posta hesabın kayıtlı adresine gider; Aboneliklerim sayfası bu adresi gösterir
+- [x] E-posta bildirimi: Brevo REST API (`BrevoEpostaGonderici`, `"eposta"` HttpClient'ı, 10 sn zaman aşımı); anahtar yoksa deneme modu (`.eml` dosyası)
+- [x] Toplu bildirim kuyruğu (`Bildirimler` tablosu, uyarıyla aynı transaction), 3 deneme + artan bekleme, 250 ms hız sınırı, 401'de durdurma
+- [x] Yönetici: `/Uyari/Bildirimler/{id}` gönderim kayıtları ve "Başarısızları yeniden dene"
+- [x] Harita API: toplanma alanı formunda "Adresten konum bul" (OpenStreetMap Nominatim, `"harita"` HttpClient'ı, User-Agent, saniyede 1 istek); listede "Haritada aç"
+- [x] Anahtarlar ortam değişkeninde: `AFET_EPOSTA_API_ANAHTARI`, `AFET_EPOSTA_GONDEREN` (isteğe bağlı `AFET_HARITA_URL`)
+- [x] HTTP üzerinden 16 senaryo testi geçti (SMS reddi, yayın → e-posta özeti, kayıt sayfası, yeniden deneme, adresten konum, bulunamayan adres)
+
+## Hafta 10 · Yapay Zekâ Bileşeni: Duyuru Özetleme ve Sade Uyarı ✅
+- [x] `/Uyari` formunda "Yapay zekâ ile sade uyarı taslağı": kurum duyurusu + seçili bölgeler → başlık, mesaj, seviye, afet türü alanlarına yazılan taslak (yayınlanmaz)
+- [x] Claude (`claude-opus-5-5`, Anthropic C# SDK 13.8.0), JSON şemalı yapılandırılmış çıktı, sunucu tarafı yedek model; anahtar `ANTHROPIC_API_KEY`
+- [x] `CiktiDogrulayici` (uydurma sayı / adres, bölge adı, uzunluk, seviye, tür; uzun cümle uyarısı) ve kural tabanlı yedek özetleyici
+- [x] AI günlüğü: `/Uyari/YapayZekaGunlugu` (istem, ham çıktı, doğrulama notları)
+- [x] Hata düzeltmesi: "Taslak üret" düğmesi yayın onay penceresini açıyordu; onay artık yalnızca "Uyarıyı Yayınla" için soruluyor
+- [x] HTTP testleri: anahtarsız 12/12, geçersiz anahtarla (gerçek Claude çağrısı → 401 → kural tabanlı yedek) 12/12
 
 ### Vize öncesi tarayıcıda denenen senaryolar (hepsi beklendiği gibi)
 | Senaryo | Sonuç |

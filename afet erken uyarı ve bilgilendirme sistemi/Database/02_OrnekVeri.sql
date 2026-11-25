@@ -60,7 +60,7 @@ INSERT INTO dbo.Abonelikler (KullaniciId, BolgeId, BildirimKanali, MinSeviye)
 SELECT a.KullaniciId, b.BolgeId, a.Kanal, a.MinSeviye
 FROM (VALUES
         (@v1, N'Bingöl',  N'Merkez',  N'Uygulama', 1),
-        (@v1, N'Bingöl',  N'Solhan',  N'SMS',      2),
+        (@v1, N'Bingöl',  N'Solhan',  N'Eposta',   2),
         (@v2, N'Rize',    N'Merkez',  N'Eposta',   1),
         (@v2, N'Elazığ',  N'Merkez',  N'Uygulama', 3)
      ) a (KullaniciId, Il, Ilce, Kanal, MinSeviye)

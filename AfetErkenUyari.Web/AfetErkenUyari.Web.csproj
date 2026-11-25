@@ -9,6 +9,8 @@
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.1" />
+    <!-- Hafta 10: resmî Anthropic (Claude) C# SDK -->
+    <PackageReference Include="Anthropic" Version="13.8.0" />
   </ItemGroup>
 
 </Project>

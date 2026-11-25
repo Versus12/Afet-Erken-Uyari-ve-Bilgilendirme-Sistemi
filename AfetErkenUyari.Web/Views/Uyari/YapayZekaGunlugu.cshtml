@@ -1,0 +1,54 @@
+@model List<YapayZekaKaydi>
+@{
+    ViewData["Title"] = "Yapay Zekâ Günlüğü";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h1 class="h4 mb-1">Yapay Zekâ Günlüğü</h1>
+        <div class="text-muted small">Her taslak denemesinin istemi (prompt), ham çıktısı ve doğrulama sonucu. AI çıktısı körlemesine kullanılmaz.</div>
+    </div>
+    <a class="btn btn-outline-secondary" asp-controller="Uyari" asp-action="Index">Uyarı yayınına dön</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="kart"><p class="text-muted mb-0">Henüz kayıt yok.</p></div>
+}
+@foreach (var k in Model)
+{
+    <div class="kart mb-3">
+        <div class="d-flex flex-wrap justify-content-between gap-2">
+            <div>
+                <span class="badge @(k.Gecerli ? "bg-success" : "bg-danger")">@(k.Gecerli ? "Doğrulamadan geçti" : "Doğrulamadan geçmedi")</span>
+                <strong class="ms-1">@k.Saglayici</strong>
+                <span class="small text-muted">· @k.HedefBolgeler</span>
+            </div>
+            <div class="small text-muted">
+                @k.Tarih.ToString("dd.MM.yyyy HH:mm") · @k.KullaniciAdi
+                @if (k.SureMs.HasValue) { <span>· @k.SureMs ms</span> }
+            </div>
+        </div>
+        @if (k.Baslik != null)
+        {
+            <div class="mt-2">
+                <strong>@k.Baslik</strong>
+                @if (k.OnerilenSeviye.HasValue)
+                {
+                    <span class="badge bg-@UyariSeviyeleri.Renk(k.OnerilenSeviye.Value) ms-1">@UyariSeviyeleri.Ad(k.OnerilenSeviye.Value)</span>
+                }
+                <div>@k.Mesaj</div>
+            </div>
+        }
+        <div class="small mt-2 istem-kutusu">@k.DogrulamaNotlari</div>
+        <details class="mt-2">
+            <summary class="small">Kaynak duyuru, istem ve ham çıktı</summary>
+            <div class="small fw-semibold mt-2">Kaynak duyuru</div>
+            <div class="istem-kutusu border rounded p-2">@k.KaynakMetin</div>
+            <div class="small fw-semibold mt-2">İstem (prompt)</div>
+            <div class="istem-kutusu border rounded p-2">@k.Istem</div>
+            <div class="small fw-semibold mt-2">Ham çıktı</div>
+            <div class="istem-kutusu border rounded p-2">@(k.HamCikti ?? "(yok)")</div>
+        </details>
+    </div>
+}

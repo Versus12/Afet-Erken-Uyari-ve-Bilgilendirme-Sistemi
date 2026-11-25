@@ -3,7 +3,7 @@
 Vatandaşların bölge bazlı afet uyarılarını ve hazırlık yönergelerini tek bir yerden almasını sağlayan,
 yerel yönetimlerin de uyarı yayınlayabildiği **Windows Forms (.NET Framework 4.7.2)** masaüstü uygulaması.
 
-> Bilgisayar Uygulamaları I – Proje Tabanlı Ders · **P14** · Sürüm **v0.8.0 (Vize ara sürümü, Hafta 3–8)**
+> Bilgisayar Uygulamaları I – Proje Tabanlı Ders · **P14** · Sürüm **v0.10.0 (Hafta 3–10)**
 
 Çözümde iki istemci vardır; ikisi de aynı SQL Server veritabanını (`AfetBilgilendirme`) kullanır:
 
@@ -18,8 +18,11 @@ Web sitesinin kurulumu ve sayfaları için: [AfetErkenUyari.Web/README.md](AfetE
 | Modül | Vatandaş | Yönetici |
 |---|---|---|
 | Kayıt / giriş (BCrypt, rol, oturum zaman aşımı, hatalı giriş kilidi) | ✅ | ✅ |
-| Bölge aboneliği + tercih (kanal, minimum seviye, durdur/başlat) | ✅ | ✅ |
+| Bölge aboneliği + tercih (kanal: Uygulama içi / E-posta, minimum seviye, durdur/başlat) | ✅ | ✅ |
 | Uyarılarım + uygulama içi bildirim (60 sn'de bir yenileme, sesli uyarı) | ✅ | ✅ |
+| E-posta bildirimi (kayıtlı adrese; Brevo API veya deneme modu) — Hafta 9 | alır | gönderir + kayıtları izler |
+| Harita API: adresten konum bulma (OpenStreetMap Nominatim), haritada aç — Hafta 9 | haritada açar | ✅ |
+| Yapay zekâ: kurum duyurusundan bölgeye özel sade uyarı taslağı (Claude) + doğrulama + AI günlüğü — Hafta 10 | – | ✅ |
 | Hazırlık rehberi (afet türü × önce/sırasında/sonra) | okur | okur + düzenler |
 | Toplanma alanları (bölge filtresi, kapasite) | okur | okur + düzenler |
 | Bölge yönetimi | – | ✅ |
@@ -51,6 +54,22 @@ Ayrıntı: [Docs/Mimari-Sema.md](afet%20erken%20uyar%C4%B1%20ve%20bilgilendirme%
 3. `App.config` içindeki `AfetDB` bağlantısında `Data Source` değerini kendi SQL Server örneğinizle değiştirin.
 4. `afet erken uyarı ve bilgilendirme sistemi.sln` dosyasını açın; NuGet paketleri otomatik geri yüklenir. `F5` ile çalıştırın.
 
+### Hafta 9 · Harici API ayarları (ortam değişkenleri)
+API anahtarları koda ve depoya yazılmaz. Tanımlı değilse uygulama yine çalışır: e-postalar **deneme modunda**
+`%LOCALAPPDATA%\AfetErkenUyari\GidenEpostalar` klasörüne `.eml` dosyası olarak yazılır.
+
+| Değişken | Anlamı |
+|---|---|
+| `AFET_EPOSTA_API_ANAHTARI` | Brevo API anahtarı (gerçek e-posta gönderimi için) |
+| `AFET_EPOSTA_GONDEREN` | Brevo'da doğrulanmış gönderen e-posta adresi |
+| `AFET_HARITA_URL` | (İsteğe bağlı) farklı bir Nominatim sunucusu; varsayılan `https://nominatim.openstreetmap.org` |
+| `ANTHROPIC_API_KEY` | (Hafta 10) Claude API anahtarı. Yoksa sade uyarı taslağı **kural tabanlı** yöntemle üretilir. |
+
+```bash
+setx AFET_EPOSTA_API_ANAHTARI "xkeysib-..."
+setx AFET_EPOSTA_GONDEREN "adiniz@ornek.com"
+```
+
 ### Test hesapları (yalnızca geliştirme ortamı, sentetik veri)
 | Kullanıcı adı | Şifre | Rol |
 |---|---|---|
@@ -60,10 +79,11 @@ Ayrıntı: [Docs/Mimari-Sema.md](afet%20erken%20uyar%C4%B1%20ve%20bilgilendirme%
 
 ## Veritabanı
 Veritabanı adı: **AfetBilgilendirme** — Tablolar: `Kullanicilar`, `Bolgeler`, `Abonelikler` (N-N), `Uyarilar`,
-`UyariBolgeleri` (N-N), `HazirlikRehberi`, `ToplanmaAlanlari`.
+`UyariBolgeleri` (N-N), `HazirlikRehberi`, `ToplanmaAlanlari`, `Bildirimler` (Hafta 9 — e-posta kuyruğu ve gönderim kaydı),
+`YapayZekaKayitlari` (Hafta 10 — AI günlüğü: istem, ham çıktı, doğrulama).
 
 ## Proje belgeleri
-- [Haftalık ilerleme (Hafta 3–8)](afet%20erken%20uyar%C4%B1%20ve%20bilgilendirme%20sistemi/Docs/Haftalik-Ilerleme.md)
+- [Haftalık ilerleme (Hafta 3–10)](afet%20erken%20uyar%C4%B1%20ve%20bilgilendirme%20sistemi/Docs/Haftalik-Ilerleme.md)
 - [Güvenlik notu](afet%20erken%20uyar%C4%B1%20ve%20bilgilendirme%20sistemi/Docs/Guvenlik-Notu.md)
 - [Vize ilerleme raporu](afet%20erken%20uyar%C4%B1%20ve%20bilgilendirme%20sistemi/Docs/Vize-Ilerleme-Raporu.md)
 - [Demo senaryosu](afet%20erken%20uyar%C4%B1%20ve%20bilgilendirme%20sistemi/Docs/Demo-Senaryosu.md)
@@ -71,5 +91,5 @@ Veritabanı adı: **AfetBilgilendirme** — Tablolar: `Kullanicilar`, `Bolgeler`
 - [Sözlü sınav hazırlık](afet%20erken%20uyar%C4%B1%20ve%20bilgilendirme%20sistemi/Docs/Sozlu-Sinav-Hazirlik.md)
 
 ## Geliştirme durumu
-Hafta 3–8 tamamlandı (vize ara sürümü `v0.8.0`). Sıradaki: harita/bildirim API (H9), yapay zekâ ile sade uyarı metni (H10),
+Hafta 3–10 tamamlandı (vize ara sürümü `v0.8.0`, Hafta 9 `v0.9.0`, Hafta 10 `v0.10.0`). Sıradaki:
 en yakın toplanma alanı (H11), yönetim panosu (H12).

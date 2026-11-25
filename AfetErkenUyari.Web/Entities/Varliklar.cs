@@ -97,3 +97,95 @@ public class ToplanmaAlani
     public decimal? Boylam { get; set; }
     public string BolgeAdi { get; set; } = "";
 }
+
+/// <summary>
+/// Tablo: Bildirimler — bir uyarının bir kullanıcıya e-postayla gönderim kaydı (Hafta 9).
+/// Kuyruk + günlük görevi görür: önce "Bekliyor" eklenir, gönderimden sonra sonucu yazılır.
+/// </summary>
+public class Bildirim
+{
+    public int BildirimId { get; set; }
+    public int UyariId { get; set; }
+    public int KullaniciId { get; set; }
+    public string Kanal { get; set; } = BildirimKanallari.Eposta;
+    public string Alici { get; set; } = "";
+    public string Durum { get; set; } = BildirimDurumlari.Bekliyor;
+    public int DenemeSayisi { get; set; }
+    public string? SonHata { get; set; }
+    public string? SaglayiciMesajId { get; set; }
+    public DateTime OlusturmaTarihi { get; set; }
+    public DateTime? GonderimTarihi { get; set; }
+
+    // Listeleme için (JOIN)
+    public string KullaniciAdi { get; set; } = "";
+}
+
+/// <summary>E-posta gönderim sonucunun özeti.</summary>
+public class BildirimSonucu
+{
+    public int Toplam { get; set; }
+    public int Gonderilen { get; set; }
+    public int DenemeModu { get; set; }
+    public int Basarisiz { get; set; }
+    public string SaglayiciAdi { get; set; } = "";
+
+    public override string ToString()
+    {
+        if (Toplam == 0) return "E-posta tercih eden abone yok.";
+        string s = $"{Toplam} e-posta: {Gonderilen} gönderildi";
+        if (DenemeModu > 0) s += $", {DenemeModu} deneme modunda dosyaya yazıldı";
+        if (Basarisiz > 0) s += $", {Basarisiz} başarısız (yeniden denenebilir)";
+        return s + ".";
+    }
+}
+
+/// <summary>Yayın sonucu: uyarı numarası, ulaşacağı abone sayısı ve e-posta gönderim özeti.</summary>
+public class YayinSonucu
+{
+    public int UyariId { get; set; }
+    public int AliciSayisi { get; set; }
+    public BildirimSonucu Eposta { get; set; } = new();
+}
+
+/// <summary>Harita servisinin adresten bulduğu konum (Hafta 9).</summary>
+public record KonumSonucu(decimal Enlem, decimal Boylam, string BulunanAdres);
+
+/// <summary>Tablo: YapayZekaKayitlari — AI günlüğü (Hafta 10). Her taslak üretme denemesi kaydedilir.</summary>
+public class YapayZekaKaydi
+{
+    public int KayitId { get; set; }
+    public int KullaniciId { get; set; }
+    public DateTime Tarih { get; set; }
+    public string Saglayici { get; set; } = "";
+    public string HedefBolgeler { get; set; } = "";
+    public string KaynakMetin { get; set; } = "";
+    public string Istem { get; set; } = "";
+    public string? HamCikti { get; set; }
+    public string? Baslik { get; set; }
+    public string? Mesaj { get; set; }
+    public int? OnerilenSeviye { get; set; }
+    public bool Gecerli { get; set; }
+    public string? DogrulamaNotlari { get; set; }
+    public int? SureMs { get; set; }
+
+    // Listeleme için (JOIN)
+    public string KullaniciAdi { get; set; } = "";
+}
+
+/// <summary>Duyurudan üretilen sade uyarı taslağı (Hafta 10). Yayınlanmaz; yönetici kontrol edip yayınlar.</summary>
+public class SadeUyariTaslagi
+{
+    public string Baslik { get; set; } = "";
+    public string Mesaj { get; set; } = "";
+    public int Seviye { get; set; } = 2;
+    public string AfetTuru { get; set; } = "";
+    /// <summary>"Claude (claude-opus-5-5)" veya "Kural tabanlı".</summary>
+    public string Saglayici { get; set; } = "";
+    public bool YapayZekaKullanildi { get; set; }
+    /// <summary>Doğrulamadan geçti mi? Geçmediyse yayın formuna aktarılmaz.</summary>
+    public bool Gecerli { get; set; }
+    public List<string> Hatalar { get; set; } = new();
+    public List<string> Uyarilar { get; set; } = new();
+    /// <summary>Kullanıcıya gösterilecek bilgi (örn. neden kural tabanlı taslak gösterildiği).</summary>
+    public string Not { get; set; } = "";
+}

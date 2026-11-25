@@ -12,6 +12,38 @@
         <div class="kart">
             <div class="kart-baslik">Yeni uyarı</div>
             <form asp-controller="Uyari" asp-action="Yayinla" method="post" id="uyariFormu">
+                @* ---------------- Hafta 10: yapay zekâ ile sade uyarı taslağı ---------------- *@
+                <details class="mb-3 border rounded p-2 bg-light" open="@(Model.Taslak != null || !string.IsNullOrEmpty(f.KaynakMetin))">
+                    <summary class="fw-semibold">Yapay zekâ ile sade uyarı taslağı</summary>
+                    <p class="small text-muted mt-2 mb-2">
+                        Kurumun (AFAD, MGM, valilik) duyurusunu yapıştırın, aşağıdan hedef bölgeleri seçin ve
+                        <em>Taslak üret</em>e basın. Taslak alanlara yazılır; yayınlamadan önce mutlaka okuyun.
+                        <br />Yöntem: <strong>@Model.YapayZekaYontemi</strong>
+                    </p>
+                    <label for="KaynakMetin" class="visually-hidden">Kurum duyurusu</label>
+                    <textarea id="KaynakMetin" name="KaynakMetin" class="form-control mb-2" rows="5" maxlength="4000"
+                              placeholder="Kurumun teknik duyurusunu buraya yapıştırın…">@f.KaynakMetin</textarea>
+                    <button type="submit" class="btn btn-sm btn-ai" asp-controller="Uyari" asp-action="SadeUyariUret" formnovalidate>
+                        Taslak üret
+                    </button>
+                    <a class="small ms-2" asp-controller="Uyari" asp-action="YapayZekaGunlugu">Yapay zekâ günlüğü</a>
+                    @if (Model.Taslak is { } tk)
+                    {
+                        <div class="alert @(tk.Gecerli ? "alert-success" : "alert-danger") small mt-2 mb-0">
+                            @if (!string.IsNullOrEmpty(tk.Not)) { <div class="mb-1"><strong>Not:</strong> @tk.Not</div> }
+                            <div><strong>@(tk.Gecerli ? "✔ Taslak doğrulamadan geçti ve aşağıdaki alanlara yazıldı." : "✖ Taslak doğrulamadan geçemedi; alanlara yazılmadı.")</strong>
+                                (üreten: @tk.Saglayici)</div>
+                            @if (!tk.Gecerli && tk.Baslik.Length > 0) { <div class="mt-1"><em>@tk.Baslik</em> — @tk.Mesaj</div> }
+                            @if (tk.Hatalar.Count + tk.Uyarilar.Count > 0)
+                            {
+                                <ul class="mb-0 mt-1">
+                                    @foreach (var h in tk.Hatalar) { <li>HATA: @h</li> }
+                                    @foreach (var u in tk.Uyarilar) { <li>UYARI: @u</li> }
+                                </ul>
+                            }
+                        </div>
+                    }
+                </details>
                 <div class="mb-3">
                     <label for="Baslik" class="form-label">Başlık</label>
                     <input id="Baslik" name="Baslik" value="@f.Baslik" class="form-control" maxlength="150" required />
@@ -101,7 +133,9 @@
                                     @(u.BitisTarihi?.ToString("dd.MM.yyyy HH:mm") ?? "—")
                                 </td>
                                 <td><span class="badge @(durum == "Yayında" ? "bg-success" : "bg-secondary")">@durum</span></td>
-                                <td>
+                                <td class="text-nowrap">
+                                    <a class="btn btn-sm btn-outline-secondary mb-1" asp-controller="Uyari" asp-action="Bildirimler"
+                                       asp-route-id="@u.UyariId" title="E-posta gönderim kayıtları">E-posta</a>
                                     @if (u.AktifMi)
                                     {
                                         <form asp-controller="Uyari" asp-action="Kaldir" asp-route-id="@u.UyariId" method="post"
@@ -136,6 +170,8 @@
 
             // Yayın öncesi onay: kaç bölgeye, hangi seviyede gideceği gösterilir.
             document.getElementById("uyariFormu").addEventListener("submit", function (e) {
+                // Hafta 10: "Taslak üret" düğmesi yayın yapmaz; yayın onayı sorulmaz.
+                if (e.submitter && e.submitter.getAttribute("formaction")) return;
                 const secili = document.querySelectorAll(".bolge-secim:checked").length;
                 if (secili === 0) return; // sunucu "en az bir bölge" kuralıyla reddeder
                 const seviye = document.getElementById("Seviye").selectedOptions[0].text;

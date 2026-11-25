@@ -9,13 +9,15 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
 {
     /// <summary>
     /// Toplanma alanları listesi (bölge filtreli). Yönetici alan ekleyip düzenleyebilir.
-    /// Harita gösterimi ve en yakın alan hesabı Hafta 11 kapsamındadır.
+    /// Hafta 9: adresten koordinat bulma (Nominatim API) ve alanı OpenStreetMap'te açma.
+    /// Uygulama içi harita modülü ve en yakın alan hesabı Hafta 11 kapsamındadır.
     /// </summary>
     public partial class FrmToplanmaAlanlari : Form
     {
         private readonly ToplanmaAlaniManager _manager = new ToplanmaAlaniManager();
         private readonly BolgeManager _bolgeManager = new BolgeManager();
         private readonly AbonelikManager _abonelikManager = new AbonelikManager();
+        private readonly HaritaServisi _harita = new HaritaServisi();
         private bool _yukleniyor = true;
         private int _seciliId;
 
@@ -122,6 +124,38 @@ namespace afet_erken_uyarı_ve_bilgilendirme_sistemi
                 ArayuzYardimci.Bilgi("Toplanma alanı kaydedildi.");
                 Listele();
             }
+        }
+
+        /// <summary>Hafta 9 - Harita API: yazılan adresi OpenStreetMap Nominatim ile koordinata çevirir.</summary>
+        private void btnKonumBul_Click(object sender, EventArgs e)
+        {
+            KonumSonucu konum = null;
+            Bolge b = cmbBolge.SelectedItem as Bolge;
+            // Aramayı netleştirmek için bölgenin il/ilçesi adrese eklenir.
+            string aranan = txtAdres.Text.Trim();
+            if (b != null && aranan.IndexOf(b.Il, StringComparison.CurrentCultureIgnoreCase) < 0)
+                aranan += ", " + b.Ilce + ", " + b.Il;
+
+            if (!ArayuzYardimci.Calistir(this, () => konum = _harita.AdresBul(aranan))) return;
+
+            txtEnlem.Text = ArayuzYardimci.OndalikYaz(konum.Enlem);
+            txtBoylam.Text = ArayuzYardimci.OndalikYaz(konum.Boylam);
+            ArayuzYardimci.Bilgi("Konum bulundu:\n" + konum.BulunanAdres +
+                                 "\n\nKoordinatlar alanlara yazıldı. Kaydetmek için \"Kaydet\"e basınız.");
+        }
+
+        /// <summary>Seçili alanı tarayıcıda OpenStreetMap haritasında gösterir.</summary>
+        private void btnHaritadaAc_Click(object sender, EventArgs e)
+        {
+            ToplanmaAlani t = ArayuzYardimci.SeciliNesne<ToplanmaAlani>(dgvAlanlar);
+            if (t == null) { ArayuzYardimci.Uyar("Listeden bir toplanma alanı seçiniz."); return; }
+            if (!t.Enlem.HasValue || !t.Boylam.HasValue)
+            {
+                ArayuzYardimci.Uyar("Bu alanın koordinatı kayıtlı değil. Yönetici \"Adresten Konum Bul\" ile ekleyebilir.");
+                return;
+            }
+            ArayuzYardimci.Calistir(this, () =>
+                System.Diagnostics.Process.Start(HaritaServisi.HaritaBaglantisi(t.Enlem.Value, t.Boylam.Value)));
         }
 
         private void btnSil_Click(object sender, EventArgs e)

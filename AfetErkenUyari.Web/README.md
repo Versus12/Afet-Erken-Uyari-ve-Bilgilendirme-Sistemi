@@ -1,6 +1,6 @@
 # Afet Erken Uyarı ve Bilgilendirme Sistemi — Web Sitesi
 
-P14 projesinin **ASP.NET Core MVC (.NET 9, C#)** ile hazırlanmış web sürümü. Kapsam: **Hafta 3 – 8** (vize ara sürümü).
+P14 projesinin **ASP.NET Core MVC (.NET 9, C#)** ile hazırlanmış web sürümü. Kapsam: **Hafta 3 – 10** (sürüm `v0.10.0`).
 Masaüstü (Windows Forms) uygulamasıyla **aynı veritabanını** (`AfetBilgilendirme`) kullanır; yönetici web'den
 uyarı yayınlarsa vatandaş masaüstü uygulamasında da görür.
 
@@ -9,7 +9,10 @@ uyarı yayınlarsa vatandaş masaüstü uygulamasında da görür.
 |---|---|---|---|
 | Kayıt / giriş (BCrypt, çerezli oturum, 30 dk zaman aşımı, hatalı giriş kilidi) | ✅ | ✅ | `/Hesap/Kayit`, `/Hesap/Giris` |
 | Uyarılarım + uygulama içi bildirim (60 sn'de bir kontrol, yeni uyarıda ses + bildirim) | ✅ | ✅ | `/Panel` |
-| Bölge aboneliği + tercih (kanal, minimum seviye, aktif/pasif) | ✅ | ✅ | `/Abonelik` |
+| Bölge aboneliği + tercih (kanal: Uygulama içi / E-posta, minimum seviye, aktif/pasif) | ✅ | ✅ | `/Abonelik` |
+| E-posta bildirimi (kayıtlı adrese; Brevo API veya deneme modu) — Hafta 9 | alır | gönderir + kayıtları izler | `/Uyari/Bildirimler/{id}` |
+| Harita API: adresten konum bulma (Nominatim), haritada aç — Hafta 9 | haritada açar | ✅ | `/ToplanmaAlani` |
+| Yapay zekâ ile sade uyarı taslağı (Claude) + doğrulama + AI günlüğü — Hafta 10 | – | ✅ | `/Uyari`, `/Uyari/YapayZekaGunlugu` |
 | Hazırlık rehberi (afet türü × önce / sırasında / sonra) | okur | okur + düzenler | `/Rehber` |
 | Toplanma alanları (bölge ve "abone olduğum bölgeler" filtresi) | okur | okur + düzenler | `/ToplanmaAlani` |
 | Bölge yönetimi | – | ✅ | `/Bolge` |
@@ -46,6 +49,11 @@ Yetki iki katmanda kontrol edilir: controller'da `[Authorize(Policy = "Yonetici"
    ```
    Site: http://localhost:5283
 
+### Hafta 9 · Harici API ayarları
+Anahtarlar ortam değişkeninden okunur (`AFET_EPOSTA_API_ANAHTARI`, `AFET_EPOSTA_GONDEREN`, isteğe bağlı `AFET_HARITA_URL`;
+Hafta 10: `ANTHROPIC_API_KEY` — yoksa sade uyarı taslağı kural tabanlı üretilir);
+tanımlı değilse e-postalar `%LOCALAPPDATA%\AfetErkenUyari\GidenEpostalar` klasörüne `.eml` olarak yazılır. Ayrıntı: kökteki README.
+
 ### Test hesapları (yalnızca geliştirme ortamı, sentetik veri)
 | Kullanıcı adı | Şifre | Rol |
 |---|---|---|
@@ -54,7 +62,7 @@ Yetki iki katmanda kontrol edilir: controller'da `[Authorize(Policy = "Yonetici"
 | `vatandas2` | `Vatandas123!` | Vatandaş |
 
 ## Belgeler
-- [Haftalık ilerleme (Hafta 3–8, web)](Docs/Web-Haftalik-Ilerleme.md)
+- [Haftalık ilerleme (Hafta 3–10, web)](Docs/Web-Haftalik-Ilerleme.md)
 - [Mimari ve güvenlik notu](Docs/Web-Mimari-ve-Guvenlik.md)
 - [Vize demo senaryosu (web)](Docs/Web-Demo-Senaryosu.md)
 - Ortak: ER diyagramı, veritabanı scriptleri, AI kullanım günlüğü → `../afet erken uyarı ve bilgilendirme sistemi/Docs`

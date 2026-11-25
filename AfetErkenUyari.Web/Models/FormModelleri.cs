@@ -35,6 +35,8 @@ public class KayitModel
 public class AbonelikSayfaModel
 {
     public List<Abonelik> Abonelikler { get; set; } = new();
+    /// <summary>E-posta bildirimlerinin gideceği kayıtlı adres.</summary>
+    public string Eposta { get; set; } = "";
     public List<Bolge> Bolgeler { get; set; } = new();
 }
 
@@ -50,6 +52,8 @@ public class ToplanmaAlaniFormModel
 {
     public ToplanmaAlani Alan { get; set; } = new() { Kapasite = 100 };
     public List<Bolge> Bolgeler { get; set; } = new();
+    /// <summary>Hafta 9: harita servisinin bulduğu adres (bilgi amaçlı).</summary>
+    public string? BulunanAdres { get; set; }
 }
 
 public class RehberSayfaModel
@@ -68,12 +72,25 @@ public class UyariFormModel
     public bool BitisVar { get; set; } = true;
     public DateTime BitisTarihi { get; set; } = DateTime.Now.AddDays(1);
     public List<Bolge> Bolgeler { get; set; } = new();
+    /// <summary>Hafta 10: yapay zekâ ile sadeleştirilecek kurum duyurusu.</summary>
+    public string? KaynakMetin { get; set; }
 }
 
 public class UyariYonetimModel
 {
     public List<Uyari> Uyarilar { get; set; } = new();
     public UyariFormModel Form { get; set; } = new();
+    /// <summary>Hafta 10: son üretilen sade uyarı taslağı (doğrulama sonucuyla).</summary>
+    public SadeUyariTaslagi? Taslak { get; set; }
+    public string YapayZekaYontemi { get; set; } = "";
+}
+
+/// <summary>Hafta 9: bir uyarının e-posta gönderim kayıtları sayfası.</summary>
+public class BildirimKayitModel
+{
+    public Uyari Uyari { get; set; } = new();
+    public string SaglayiciAdi { get; set; } = "";
+    public List<Bildirim> Kayitlar { get; set; } = new();
 }
 
 public class HataModel
